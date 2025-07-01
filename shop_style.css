@@ -1,0 +1,139 @@
+/* SHOP CARD STYLING */
+.shop-card {
+  background: linear-gradient(145deg, #1e1e1e, #111);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.03), inset 0 0 10px rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s ease;
+  backdrop-filter: blur(8px);
+  border: 2px solid transparent;
+}
+
+.shop-card::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05), transparent);
+  animation: rotate-glow 6s linear infinite;
+  z-index: 0;
+}
+
+.shop-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  border-color: #facc15;
+  box-shadow: 0 0 30px rgba(250, 204, 21, 0.3);
+}
+
+@keyframes rotate-glow {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* TITLE + PARAGRAPH */
+.shop-card h2 {
+  z-index: 1;
+  position: relative;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.shop-card p {
+  z-index: 1;
+  position: relative;
+  color: #cccccc;
+}
+
+/* PRICE LINE */
+.token-cost {
+  color: #ffd700;
+  font-weight: 600;
+  margin-bottom: 12px;
+  z-index: 1;
+  position: relative;
+}
+
+/* BUTTON */
+.shop-button {
+  background: linear-gradient(to right, #facc15, #ff9f1c);
+  color: black;
+  padding: 12px 24px;
+  font-weight: bold;
+  font-size: 1rem;
+  border-radius: 999px;
+  transition: all 0.3s ease;
+  z-index: 1;
+  position: relative;
+  box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3);
+  text-transform: uppercase;
+  width: 100%;
+}
+
+.shop-button:hover {
+  transform: scale(1.05);
+  background: linear-gradient(to right, #ffe600, #ffb347);
+  box-shadow: 0 6px 25px rgba(255, 230, 0, 0.5);
+}
+
+/* SHOP BALANCE ANIMATION */
+#shop-balance {
+  transition: all 0.3s ease-in-out;
+}
+
+#shop-balance.animate {
+  color: #ffffff;
+  text-shadow: 0 0 6px #facc15;
+  transform: scale(1.05);
+}
+
+/* FLOATING SUCCESS TEXT */
+.shop-float-text {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem 2rem;
+  color: #facc15;
+  font-size: 1.4rem;
+  font-weight: bold;
+  border-radius: 999px;
+  box-shadow: 0 0 20px #facc15;
+  z-index: 999;
+  animation: floatOut 1.2s ease forwards;
+}
+
+@keyframes floatOut {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -70%) scale(1.2);
+  }
+}
+
+/* RESPONSIVE OPTIMIZATION */
+@media (max-width: 640px) {
+  .shop-card {
+    padding: 16px;
+  }
+
+  .shop-button {
+    font-size: 0.875rem;
+    padding: 10px 20px;
+  }
+
+  .token-cost {
+    font-size: 0.9rem;
+  }
+}

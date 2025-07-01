@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GOAT10 Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      margin: 0;
+      background: radial-gradient(ellipse at center, #000000 0%, #0d0d0d 80%);
+      overflow: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      top: -5px;
+      left: -5px;
+      right: -5px;
+      bottom: -5px;
+      z-index: -1;
+      border: 15px solid transparent;
+      border-image: linear-gradient(45deg, #ffcc00, #000000, #ffcc00) 1;
+      pointer-events: none;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -2;
+    }
+
+    .title-3d {
+      font-size: 5rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, #ffcc00, #ffdd33, #ffff00);
+      background-size: 400% 400%;
+      animation: gradientFlow 6s ease infinite;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 20px #ffcc00, 0 0 40px #fff000;
+    }
+
+    @keyframes gradientFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .play-button {
+      font-size: 1.5rem;
+      font-weight: 600;
+      padding: 1rem 3rem;
+      border-radius: 9999px;
+      background: linear-gradient(to right, #ffcc00, #ffaa00);
+      box-shadow: 0 0 25px #ffcc00, 0 0 50px #ffaa00;
+      color: black;
+      transition: all 0.3s ease;
+    }
+
+    .play-button:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 40px #ffcc00, 0 0 80px #ffaa00;
+    }
+
+    .center {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particles"></canvas>
+
+  <div class="center min-h-screen flex flex-col items-center justify-center px-6">
+    <h1 class="title-3d mb-10">🐐 GOAT10</h1>
+    <a href="main.html" class="play-button">▶️ PLAY</a>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("particles");
+    const ctx = canvas.getContext("2d");
+
+    let particlesArray;
+    const colors = ["#ffcc00", "#ffaa00", "#ffff33", "#ffffff"];
+    const maxSize = 3;
+    const minSize = 0.5;
+    const numberOfParticles = 100;
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    window.addEventListener("resize", function () {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      init();
+    });
+
+    function Particle(x, y, dx, dy, size, color) {
+      this.x = x;
+      this.y = y;
+      this.dx = dx;
+      this.dy = dy;
+      this.size = size;
+      this.color = color;
+
+      this.draw = function () {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+      };
+
+      this.update = function () {
+        if (this.x + this.size > canvas.width || this.x - this.size < 0) this.dx = -this.dx;
+        if (this.y + this.size > canvas.height || this.y - this.size < 0) this.dy = -this.dy;
+        this.x += this.dx;
+        this.y += this.dy;
+        this.draw();
+      };
+    }
+
+    function init() {
+      particlesArray = [];
+      for (let i = 0; i < numberOfParticles; i++) {
+        let size = Math.random() * maxSize + minSize;
+        let x = Math.random() * (innerWidth - size * 2);
+        let y = Math.random() * (innerHeight - size * 2);
+        let dx = (Math.random() - 0.5) * 1.2;
+        let dy = (Math.random() - 0.5) * 1.2;
+        let color = colors[Math.floor(Math.random() * colors.length)];
+        particlesArray.push(new Particle(x, y, dx, dy, size, color));
+      }
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < particlesArray.length; i++) {
+        particlesArray[i].update();
+      }
+    }
+init();
+    animate();
+  </script>
+</body>
+</html>

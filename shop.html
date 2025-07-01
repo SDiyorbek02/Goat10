@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GOAT10 Shop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="shop_style.css" />
+</head>
+<body class="bg-black text-white min-h-screen flex flex-col items-center pt-12 px-4 font-sans">
+
+  <!-- 💰 Balance Display -->
+  <div id="shop-balance" class="text-lg text-center text-yellow-300 font-semibold mb-6">
+    💰 Balance: 0 🪙
+  </div>
+
+  <!-- 🛒 Shop Title -->
+  <h1 class="text-4xl font-bold text-yellow-400 mb-8">🛒 GOAT10 Shop</h1>
+
+  <!-- 🧾 Shop Items Grid -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-3xl">
+
+    <!-- 🔥 Tap Booster -->
+    <div class="shop-card shop-animate">
+      <h2 class="text-xl font-semibold text-yellow-300 mb-2">🔥 Tap Booster (2x)</h2>
+      <p class="text-sm mb-3 text-gray-300 text-center">Double tap earnings for 1 hour.</p>
+      <div class="token-cost">Price: 100 🪙</div>
+      <button onclick="buyBooster()" class="shop-button">Buy Booster</button>
+    </div> 
+
+  <!-- 🔙 Exit -->
+  <a href="main.html" class="mt-12 text-yellow-300 underline text-sm">🔙 Exit to Game</a>
+
+  <!-- ✅ Shop Logic -->
+  <script>
+    function getBalance() {
+      return parseInt(localStorage.getItem("goat10_balance") || "0");
+    }
+
+    function updateBalance(newBalance) {
+      localStorage.setItem("goat10_balance", newBalance.toString());
+      updateShopBalanceDisplay(newBalance);
+    }
+
+    function updateShopBalanceDisplay(amount) {
+      const el = document.getElementById("shop-balance");
+      if (el) {
+        el.textContent = '💰 Balance: ${amount} 🪙;'
+      }
+    }
+
+    function buyBooster() {
+      const balance = getBalance();
+      if (balance >= 100) {
+        updateBalance(balance - 100);
+        const now = Date.now();
+        localStorage.setItem("goat10_booster_active_until", now + 60 * 60 * 1000);
+        showEffect("🔥 BOOSTED for 1 hour!");
+      } else {
+        alert("❌ Not enough tokens!");
+      }
+    }
+
+    function showEffect(text) {
+      const el = document.createElement("div");
+      el.textContent = text;
+      el.style.position = "fixed";
+      el.style.top = "50%";
+      el.style.left = "50%";
+      el.style.transform = "translate(-50%, -50%)";
+      el.style.background = "#222";
+      el.style.padding = "1rem 2rem";
+      el.style.borderRadius = "999px";
+      el.style.color = "white";
+      el.style.fontSize = "1.5rem";
+      el.style.zIndex = "999";
+      el.style.boxShadow = "0 0 15px #facc15";
+      el.style.opacity = 1;
+      el.style.transition = "opacity 1s ease-out, transform 1s ease-out";
+      document.body.appendChild(el);
+
+      setTimeout(() => {
+        el.style.opacity = 0;
+        el.style.transform = "translate(-50%, -70%) scale(1.2)";
+      }, 100);
+
+      setTimeout(() => {
+        document.body.removeChild(el);
+      }, 1500);
+    }
+
+    // ✅ Load balance on page load
+    document.addEventListener("DOMContentLoaded", () => {
+      updateShopBalanceDisplay(getBalance());
+    });
+  </script>
+</body>
+</html>

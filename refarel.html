@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GOAT10 Referral</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="refarel.css" />
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>🎯 GOAT10 Referral Rewards</h1>
+
+    <div id="tg-user" style="color:#0f0; margin-bottom: 10px;"></div>
+
+    <table>
+      <thead>
+        <tr><th>👥 Referrals</th><th>💰 Reward (🪙)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>500</td></tr>
+        <tr><td>3</td><td>2000</td></tr>
+        <tr><td>7</td><td>5000</td></tr>
+        <tr><td>10</td><td>8000</td></tr>
+        <tr><td>20</td><td>20000</td></tr>
+        <tr><td>50</td><td>60000</td></tr>
+        <tr><td>100</td><td>150000</td></tr>
+      </tbody>
+    </table>
+
+    <h2>🧮 Calculate Your Reward</h2>
+    <input type="number" id="userCount" placeholder="Enter referral count" oninput="calculateReward()" />
+    <div class="reward" id="rewardText">💰 Coins: 0</div>
+
+    <button id="claimBtn" onclick="claimReward()" style="display: none;">🎁 Claim Reward</button>
+    <div id="claimMsg" class="flash"></div>
+
+    <h2>🔗 Your Referral Link</h2>
+    <input type="text" id="refLink" value="https://t.me/YourBot?start=refCode123" readonly />
+    <button onclick="copyReferral()">📋 Copy</button>
+    <div id="copiedMsg" style="display: none;">✅ Copied!</div>
+
+    <h2>🏆 Top 100 Referrers</h2>
+    <table id="leaderboard">
+      <thead>
+        <tr><th>🎖</th><th>Name</th><th>Referrals</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>John</td><td>120</td></tr>
+        <tr><td>2</td><td>Alice</td><td>100</td></tr>
+        <tr><td>3</td><td>Bob</td><td>85</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const rewardTable = [
+      { count: 1, reward: 500 },
+      { count: 3, reward: 2000 },
+      { count: 7, reward: 5000 },
+      { count: 10, reward: 8000 },
+      { count: 20, reward: 20000 },
+      { count: 50, reward: 60000 },
+      { count: 100, reward: 150000 },
+    ];
+
+    function calculateReward() {
+      const userCount = parseInt(document.getElementById("userCount").value || "0");
+      let reward = 0;
+      for (let i = rewardTable.length - 1; i >= 0; i--) {
+        if (userCount >= rewardTable[i].count) {
+          reward = rewardTable[i].reward;
+          break;
+        }
+      }
+
+      document.getElementById("rewardText").textContent = "💰 Coins: ${reward};"
+      document.getElementById("claimBtn").style.display = reward > 0 ? "block" : "none";
+    }
+
+    function claimReward() {
+      const userCount = parseInt(document.getElementById("userCount").value || "0");
+      let reward = 0;
+
+      for (let i = rewardTable.length - 1; i >= 0; i--) {
+        if (userCount >= rewardTable[i].count) {
+          reward = rewardTable[i].reward;
+          break;
+        }
+      }
+
+      if (reward > 0) {
+        let currentBalance = parseInt(localStorage.getItem("goat10_balance") || "0");
+        const newBalance = currentBalance + reward;
+        localStorage.setItem("goat10_balance", newBalance);
+        document.getElementById("claimMsg").textContent = "✅ ${reward} coins added to your balance!;"
+        document.getElementById("claimMsg").style.color = "lime";
+      } else {
+        document.getElementById("claimMsg").textContent = "❌ You do not qualify for a reward.";
+        document.getElementById("claimMsg").style.color = "red";
+      }
+
+      setTimeout(() => {
+        document.getElementById("claimMsg").textContent = "";
+      }, 4000);
+    }
+
+    function copyReferral() {
+      const refLink = document.getElementById("refLink");
+      refLink.select();
+      refLink.setSelectionRange(0, 99999);
+      document.execCommand("copy");
+
+      document.getElementById("copiedMsg").style.display = "block";
+      setTimeout(() => {
+        document.getElementById("copiedMsg").style.display = "none";
+      }, 2000);
+    }
+
+// Show Telegram User Info
+    window.addEventListener("DOMContentLoaded", () => {
+      if (window.Telegram && Telegram.WebApp) {
+        Telegram.WebApp.ready();
+        Telegram.WebApp.expand();
+
+        const user = Telegram.WebApp.initDataUnsafe?.user;
+        if (user) {
+          document.getElementById("tg-user").innerHTML = '👤 <b>${user.first_name || "User"}</b>;'
+        }
+      }
+    });
+  </script>
+</body>
+</html>

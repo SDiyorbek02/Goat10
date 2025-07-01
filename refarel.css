@@ -1,0 +1,125 @@
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: #000;
+  color: #f1c40f;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid #f1c40f33;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(241, 196, 15, 0.2);
+}
+
+h1, h2 {
+  margin-bottom: 15px;
+  color: #f1c40f;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 16px;
+  overflow-x: auto;
+}
+
+th, td {
+  border-bottom: 1px solid #f1c40f33;
+  padding: 12px 8px;
+  text-align: center;
+}
+
+th {
+  background-color: #111;
+  font-weight: bold;
+  color: #f39c12;
+}
+
+tr:nth-child(even) {
+  background-color: #111111;
+}
+
+tr:hover {
+  background-color: #1a1a1a;
+}
+
+input[type="number"],
+input[type="text"] {
+  width: 90%;
+  max-width: 300px;
+  padding: 12px;
+  margin: 10px auto;
+  font-size: 16px;
+  border-radius: 10px;
+  border: 1px solid #f1c40f44;
+  text-align: center;
+  background: #1a1a1a;
+  color: #f1c40f;
+  outline: none;
+  display: block;
+}
+
+button {
+  padding: 12px 24px;
+  background-color: #f39c12;
+  color: #000;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 8px auto;
+  display: inline-block;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #e67e22;
+}
+
+.reward {
+  font-size: 20px;
+  margin-top: 10px;
+  color: #f7dc6f;
+}
+
+.flash {
+  font-size: 24px;
+  font-weight: bold;
+  margin-top: 15px;
+  animation: flash 1s ease-in-out forwards;
+  color: #2ecc71;
+}
+
+@keyframes flash {
+  0% { opacity: 0; transform: scale(0.7); }
+  50% { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Mobil uchun */
+@media (max-width: 600px) {
+  .container {
+    margin: 10px;
+    padding: 15px;
+  }
+
+  h1, h2 {
+    font-size: 20px;
+  }
+
+  table {
+    font-size: 14px;
+  }
+
+  button {
+    width: 100%;
+    font-size: 16px;
+  }
+}

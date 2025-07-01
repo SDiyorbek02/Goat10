@@ -1,0 +1,127 @@
+/* 🌌 Canvas background */
+canvas#particles {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at center, #0f0f0f 0%, #000000 100%);
+}
+
+/* 🪙 Coin style */
+.coin-image {
+  width: 200px;
+  height: 200px;
+  transition: transform 0.15s ease, filter 0.3s ease;
+  cursor: pointer;
+  will-change: transform, filter;
+}
+
+/* 🪙 Default Click Effect */
+.clicked {
+  animation: defaultTap 0.2s ease;
+}
+
+@keyframes defaultTap {
+  0% { transform: scale(1); filter: drop-shadow(0 0 5px #999); }
+  50% { transform: scale(1.15) rotate(10deg); filter: drop-shadow(0 0 12px #eee); }
+  100% { transform: scale(1); filter: none; }
+}
+
+/* ➕ Floating token text */
+.floating-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: 24px;
+  font-weight: bold;
+  transform: translate(-50%, -50%);
+  animation: floatUp 0.7s ease-out forwards;
+  pointer-events: none;
+  z-index: 99;
+  opacity: 0.95;
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.4);
+}
+
+.floating-text-boost {
+  color: #facc15 !important;
+  text-shadow: 0 0 10px #facc15;
+}
+
+@keyframes floatUp {
+  0% { opacity: 1; transform: translate(-50%, -50%) translateY(0); }
+  100% { opacity: 0; transform: translate(-50%, -50%) translateY(-40px); }
+}
+
+/* 💥 Booster mode: Glow + Explosion */
+.coin-image.booster-active {
+  animation: boosterTap 0.4s ease, boosterGlow 1.2s infinite alternate;
+}
+
+@keyframes boosterTap {
+  0% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.4) rotate(-15deg); filter: brightness(2.5) drop-shadow(0 0 16px #facc15); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+
+@keyframes boosterGlow {
+  from { filter: brightness(2.2) drop-shadow(0 0 15px #facc15); }
+  to { filter: brightness(2.8) drop-shadow(0 0 25px #ffe000); }
+}
+
+/* 🌟 Auto Tap: Electric Pulse */
+.coin-image.autotap-active {
+  animation: autoTapZap 0.3s ease, autoTapPulse 0.6s infinite alternate;
+}
+
+@keyframes autoTapZap {
+  0% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.3) rotate(5deg); filter: brightness(2) drop-shadow(0 0 14px #00f2ff); }
+  100% { transform: scale(1); }
+}
+
+@keyframes autoTapPulse {
+  from { filter: brightness(1.6) drop-shadow(0 0 12px #00ccff); }
+  to { filter: brightness(2.3) drop-shadow(0 0 22px #00ffff); }
+}
+
+/* 🧨 Tap Explosion Effect */
+.coin-image.tap-explosion {
+  animation: explosionFlash 0.3s ease-out;
+}
+
+@keyframes explosionFlash {
+  0% { transform: scale(1.2); filter: drop-shadow(0 0 5px #fff); }
+  50% { transform: scale(1.5); filter: drop-shadow(0 0 30px #ffffff); }
+  100% { transform: scale(1); filter: none; }
+}
+
+/* 🛒 UI Overlay */
+.silver-overlay {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* 🎮 Menu Button */
+.menu-button {
+  width: 70px;
+  height: 70px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.menu-button:hover {
+  transform: scale(1.08);
+  background-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}

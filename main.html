@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOAT10 Game</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .coin-image {
+      width: 250px;
+      height: 350px;
+    }
+
+    #tap-result {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2rem;
+      font-weight: bold;
+      color: silver;
+      opacity: 0;
+      transition: all 0.4s ease-out;
+      pointer-events: none;
+      z-index: 20;
+    }
+
+    /* 🔄 Button Animation */
+    .menu-anim {
+      transition: transform 0.2s ease, filter 0.2s ease;
+    }
+
+    .menu-anim:hover {
+      transform: scale(1.2) rotate(4deg);
+      filter: drop-shadow(0 0 10px #facc15);
+    }
+  </style>
+</head>
+<body class="bg-black text-white min-h-screen flex flex-col items-center justify-between relative">
+
+  <!-- Background -->
+  <canvas id="particles" class="absolute top-0 left-0 w-full h-full -z-10"></canvas>
+  <div class="silver-overlay"></div>
+
+  <!-- 🔝 Top Menu -->
+  <div class="flex gap-6 mt-6 bg-black/80 px-6 py-3 rounded-xl shadow-lg z-10">
+    <a href="wallet.html" class="flex flex-col items-center justify-center text-white menu-anim">
+      <div class="text-xl">👛</div>
+      <span id="walletShort" class="text-sm mt-1">Wallet</span>
+    </a>
+    <a href="leaderboard.html" class="flex flex-col items-center justify-center text-white menu-anim">
+      <div class="text-xl">🏆</div>
+      <span class="text-sm mt-1">Leaderboard</span>
+    </a>
+    <div class="flex flex-col items-center justify-center text-white menu-anim">
+      <div class="text-xl">🪙</div>
+      <span id="balance" class="text-yellow-400 text-sm font-bold mt-1">0</span>
+    </div>
+  </div>
+
+  <!-- 🪙 Coin -->
+  <div class="relative flex flex-col items-center mt-6">
+    <img src="goat10_coin.png" alt="GOAT10 Coin" class="coin-image" id="coin" />
+    <div id="tap-result">+1</div>
+
+    <!-- ⚡️ Energy -->
+    <div class="mt-4 text-lg font-bold">
+      ⚡️ <span id="energy">500</span>
+    </div>
+    <div id="energy-wait" class="hidden text-xs mt-1 text-gray-400">24h Recharge 🔋</div>
+  </div>
+
+  <!-- 🔻 Bottom Menu -->
+  <div class="flex gap-6 mb-10 mt-8 bg-black/80 px-6 py-3 rounded-xl shadow-lg z-10">
+    <button onclick="goToReferral()" class="flex flex-col items-center justify-center text-white menu-anim">
+      <div class="text-xl">👥</div>
+      <span class="text-sm mt-1">Referral</span>
+    </button>
+    <a href="shop.html" class="flex flex-col items-center justify-center text-white menu-anim">
+      <div class="text-xl">🛒</div>
+      <span class="text-sm mt-1">Shop</span>
+    </a>
+    <button class="flex flex-col items-center justify-center text-white menu-anim">
+      <div class="text-xl">💵</div>
+      <span class="text-sm mt-1">Withdraw</span>
+    </button>
+  </div>
+
+  <!-- Scripts -->
+  <script src="particles.js"></script>
+  <script src="game.js"></script>
+
+  <!-- ⚙️ Energy Logic -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const walletAddress = localStorage.getItem("goat10_wallet");
+      const walletShort = document.getElementById("walletShort");
+      if (walletAddress && walletShort) {
+        const short = walletAddress.slice(0, 6) + "..." + walletAddress.slice(-4);
+        walletShort.textContent = short;
+      } else {
+        walletShort.textContent = "Wallet";
+      }
+
+      const balance = localStorage.getItem("goat10_balance") || "0";
+      document.getElementById("balance").textContent = balance;
+
+      const today = new Date().toISOString().split('T')[0];
+      const lastUpdate = localStorage.getItem("goat10_energy_date");
+
+      if (lastUpdate !== today) {
+        localStorage.setItem("goat10_energy", "500");
+        localStorage.setItem("goat10_energy_date", today);
+      }
+
+      const energyVal = parseInt(localStorage.getItem("goat10_energy") || "0");
+      document.getElementById("energy").textContent = energyVal;
+
+if (energyVal <= 0) {
+        document.getElementById("energy-wait").classList.remove("hidden");
+      }
+    });
+
+    function goToReferral() {
+      const wallet = localStorage.getItem("goat10_wallet") || "12345";
+      window.location.href = 'refarel.html?ref=${wallet};'
+    }
+  </script>
+</body>
+</html>

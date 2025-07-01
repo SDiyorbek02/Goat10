@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🏆 GOAT10 Leaderboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background-color: #0e0e0e;
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
+    .neon-card {
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 12px;
+      padding: 14px 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: transform 0.2s;
+    }
+    .neon-card:hover {
+      transform: scale(1.015);
+      background: rgba(255, 255, 255, 0.07);
+    }
+    .top-1 {
+      background: linear-gradient(to right, #FFD700, #FFB300);
+      color: #000;
+      font-weight: bold;
+    }
+    .top-2 {
+      background: linear-gradient(to right, #C0C0C0, #A9A9A9);
+      color: #000;
+      font-weight: bold;
+    }
+    .top-3 {
+      background: linear-gradient(to right, #CD7F32, #B87333);
+      color: #fff;
+      font-weight: bold;
+    }
+    .rank-number {
+      width: 45px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 📢 Banner -->
+  <div class="text-center py-4 bg-yellow-400 text-black shadow-lg">
+    <h1 class="text-2xl font-bold">🎁 Weekly Rewards for Top 3 Players!</h1>
+    <p class="text-sm mt-1">🥇 1st: 10,000 🪙 | 🥈 2nd: 5,000 🪙 | 🥉 3rd: 2,500 🪙</p>
+  </div>
+
+  <!-- 🏆 Leaderboard -->
+  <div class="max-w-3xl mx-auto py-10 px-4">
+    <h2 class="text-4xl text-center mb-6 font-bold text-white drop-shadow">🏆 Top 100 Players</h2>
+    <ul id="leaderboard" class="space-y-3"></ul>
+  </div>
+
+  <script>
+    const leaderboardData = Array.from({ length: 100 }, (_, i) => ({
+      username: i === 0 ? "LegendKing" :
+                i === 1 ? "ProMaster" :
+                i === 2 ? "FastTapper" :
+                Player${i + 1},
+      balance: Math.floor(Math.random() * 50000 + 1000)
+    }));
+
+    leaderboardData.sort((a, b) => b.balance - a.balance);
+
+    const leaderboardEl = document.getElementById("leaderboard");
+
+    leaderboardData.forEach((user, index) => {
+      const li = document.createElement("li");
+      let specialClass = "";
+      if (index === 0) specialClass = "top-1";
+      else if (index === 1) specialClass = "top-2";
+      else if (index === 2) specialClass = "top-3";
+
+      li.className = neon-card ${specialClass};
+      li.innerHTML = 
+        <div class="flex items-center gap-4">
+          <div class="rank-number">#${index + 1}</div>
+          <div class="text-lg font-semibold">${user.username}</div>
+        </div>
+        <div class="text-yellow-400 text-lg font-bold">${user.balance} 🪙</div>
+      ;
+      leaderboardEl.appendChild(li);
+    });
+  </script>
+
+</body>
+</html>
