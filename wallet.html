@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GOAT10 Wallet</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: #f1f1f1;
+      text-align: center;
+      padding: 30px;
+    }
+    .wallet-container {
+      max-width: 400px;
+      margin: auto;
+      padding: 20px;
+      background: #1f1f1f;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    }
+    .wallet-title {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    .wallet-options {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+    }
+    .wallet-btn {
+      background: #333;
+      border: none;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .wallet-status {
+      margin: 10px 0;
+      font-size: 16px;
+    }
+    .disconnect-btn {
+      background: #ff3b3b;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .disconnect-btn.hidden {
+      display: none;
+    }
+    .back-btn {
+      margin-top: 15px;
+      display: inline-block;
+      color: #00afff;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="wallet-container">
+    <h1 class="wallet-title">👛 GOAT10 Wallet</h1>
+    <div class="wallet-options">
+      <button onclick="connectWallet('metamask')" class="wallet-btn">
+        <img src="https://seeklogo.com/images/M/metamask-logo-09EDE53DBD-seeklogo.com.png" alt="MetaMask" width="30" height="30">
+        <span>MetaMask</span>
+      </button>
+      <button onclick="connectWallet('trust')" class="wallet-btn">
+        <img src="https://cryptologos.cc/logos/trust-wallet-token-trust-logo.png?v=032" alt="Trust Wallet" width="30" height="30">
+        <span>Trust Wallet</span>
+      </button>
+    </div>
+    <p id="walletStatus" class="wallet-status">❌ Wallet not connected</p>
+    <button onclick="disconnectWallet()" id="disconnectBtn" class="disconnect-btn hidden">🔒 Disconnect Wallet</button>
+    <a href="main.html" class="back-btn">⬅️ Back to Game</a>
+  </div>
+
+  <script>
+    let web3;
+    let account = null;
+
+    async function connectWallet(type = 'metamask') {
+      if (typeof window.ethereum === 'undefined') {
+        const isAndroid = /Android/i.test(navigator.userAgent);
+        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+        let url = '';
+
+        if (type === 'metamask') {
+          url = isAndroid
+            ? 'https://play.google.com/store/apps/details?id=io.metamask'
+            : 'https://apps.apple.com/app/metamask/id1438144202';
+        } else if (type === 'trust') {
+          url = isAndroid
+            ? 'https://play.google.com/store/apps/details?id=com.wallet.crypto.trustapp'
+            : 'https://apps.apple.com/app/trust-crypto-bitcoin-wallet/id1288339409';
+        }
+
+        alert('Wallet ilovasi topilmadi. Yuklab olishga yo‘naltirilasiz.');
+        window.location.href = url;
+        return;
+      }
+
+      try {
+        web3 = new Web3(window.ethereum);
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        account = accounts[0];
+        updateUI(account);
+        localStorage.setItem('goat10_wallet', account);
+      } catch (err) {
+        alert('Ulanmadi yoki foydalanuvchi bekor qildi.');
+        console.error(err);
+      }
+    }
+
+    function disconnectWallet() {
+      account = null;
+      localStorage.removeItem('goat10_wallet');
+      updateUI(null);
+    }
+
+    function updateUI(address) {
+      const status = document.getElementById('walletStatus');
+      const disconnectBtn = document.getElementById('disconnectBtn');
+
+if (address) {
+        const short = address.slice(0, 6) + '...' + address.slice(-4);
+        status.textContent = '✅ ' + short;
+        disconnectBtn.classList.remove('hidden');
+      } else {
+        status.textContent = '❌ Wallet not connected';
+        disconnectBtn.classList.add('hidden');
+      }
+    }
+
+    window.addEventListener('load', async () => {
+      const isWalletBrowser =
+        /MetaMask/i.test(navigator.userAgent) || /Trust/i.test(navigator.userAgent);
+
+      const saved = localStorage.getItem('goat10_wallet');
+      if (saved) {
+        account = saved;
+        updateUI(account);
+      } else if (typeof window.ethereum !== 'undefined') {
+        if (isWalletBrowser) {
+          await connectWallet('metamask'); // avtomatik ulanish
+        } else {
+          try {
+            const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+            if (accounts.length > 0) {
+              account = accounts[0];
+              updateUI(account);
+              localStorage.setItem('goat10_wallet', account);
+            }
+          } catch (e) {
+            console.warn('Auto connect error:', e);
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
