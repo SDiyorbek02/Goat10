@@ -39,18 +39,13 @@
       font-size: 16px;
       cursor: pointer;
       width: 100%;
-      transition: background 0.3s;
     }
     .btn:hover {
       background: #2ea043;
     }
     .status {
-      margin: 20px 0 10px;
+      margin-top: 15px;
       font-size: 16px;
-    }
-    .disconnect {
-      background: #f85149;
-      display: none;
     }
   </style>
 </head>
@@ -59,7 +54,6 @@
     <h1>👛 GOAT10 Wallet</h1>
     <button class="btn" onclick="connectWallet()">🔌 Connect Wallet</button>
     <div class="status" id="status">❌ Wallet ulanmagan</div>
-    <button class="btn disconnect" id="disconnectBtn" onclick="disconnectWallet()">🔒 Ulanishni bekor qilish</button>
   </div>
 
   <script>
@@ -68,7 +62,7 @@
 
     async function connectWallet() {
       if (!window.ethereum) {
-        alert("❗ Iltimos, sahifani MetaMask yoki Trust Wallet ilovasining ichida oching.");
+        alert("📱 Iltimos, sahifani MetaMask yoki Trust Wallet ilovasining brauzerida oching");
         return;
       }
 
@@ -77,38 +71,27 @@
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         account = accounts[0];
         localStorage.setItem("goat10_wallet", account);
-        updateUI(account);
+        updateStatus(account);
       } catch (error) {
-        console.log("Ulanish rad etildi:", error);
-        alert("⛔ Ulanish rad etildi.");
+        alert("❌ Ulash rad etildi");
       }
     }
 
-    function updateUI(addr) {
+    function updateStatus(addr) {
       const status = document.getElementById("status");
-      const disconnectBtn = document.getElementById("disconnectBtn");
-
       if (addr) {
         const short = addr.slice(0, 6) + "..." + addr.slice(-4);
         status.textContent = "✅ Ulandi: " + short;
-        disconnectBtn.style.display = "block";
       } else {
         status.textContent = "❌ Wallet ulanmagan";
-        disconnectBtn.style.display = "none";
       }
-    }
-
-    function disconnectWallet() {
-      account = null;
-      localStorage.removeItem("goat10_wallet");
-      updateUI(null);
     }
 
     window.addEventListener("load", () => {
       const saved = localStorage.getItem("goat10_wallet");
       if (saved) {
         account = saved;
-        updateUI(account);
+        updateStatus(account);
       }
     });
   </script>
