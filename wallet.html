@@ -100,13 +100,12 @@
         const short = account.slice(0, 6) + "..." + account.slice(-4);
         status.textContent = "✅ Connected: " + short;
 
-        const url = new URL(window.location);
-        if (!url.searchParams.get("address")) {
-          url.searchParams.set("address", account);
-          window.history.replaceState({}, '', url.toString());
-        }
+        // Save to localStorage for future visits
+        localStorage.setItem("goat10_wallet", account);
 
-        walletUrl.innerHTML = '🔗 <b>Wallet URL:</b><br><a href="${url.toString()}" style="color:#58a6ff" target="_blank">${url.toString()}</a>;'
+        // Show URL with address
+        const url = https://goat10.vercel.app/wallet.html?address=${account};
+        walletUrl;innerHTML = '🔗 <b>Wallet URL:</b><br><a href="${url}" style="color:#58a6ff" target="_blank">${url}</a>;'
       } else {
         status.textContent = "❌ Wallet not connected";
         walletUrl.innerHTML = '';
@@ -123,33 +122,37 @@
         web3 = new Web3(window.ethereum);
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const account = accounts[0];
-        localStorage.setItem("goat10_wallet", account);
         updateStatus(account);
       } catch (err) {
         alert("❌ Connection rejected.");
       }
     }
 
-    window.addEventListener("load", async () => {
-      const saved = localStorage.getItem("goat10_wallet");
+    window.addEventListener("load", () => {
+      // Check from URL
       const urlAddress = new URLSearchParams(window.location.search).get("address");
-      const showAccount = saved || urlAddress;
-
-      if (showAccount) {
-        updateStatus(showAccount);
+      if (urlAddress) {
+        updateStatus(urlAddress);
+        return;
       }
-if (window.ethereum) {
-        try {
-          web3 = new Web3(window.ethereum);
-          const accounts = await window.ethereum.request({ method: 'eth_accounts' });
 
-          if (accounts.length > 0) {
-            localStorage.setItem("goat10_wallet", accounts[0]);
-            updateStatus(accounts[0]);
-          }
-        } catch (e) {
-          console.log("Wallet status error:", e);
-        }
+      // Check from localStorage
+      const saved = localStorage.getItem("goat10_wallet");
+      if (saved) {
+        updateStatus(saved);
+        return;
+      }
+
+// If MetaMask already connected
+      if (window.ethereum) {
+        web3 = new Web3(window.ethereum);
+        window.ethereum.request({ method: 'eth_accounts' })
+          .then(accounts => {
+            if (accounts.length > 0) {
+              updateStatus(accounts[0]);
+            }
+          })
+          .catch(console.error);
       }
     });
   </script>
