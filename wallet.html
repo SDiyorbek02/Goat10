@@ -17,6 +17,19 @@
       height: 100vh;
       text-align: center;
     }
+    .btn {
+      background: #238636;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    .btn:hover {
+      background: #2ea043;
+    }
     .status {
       margin-top: 20px;
       font-size: 18px;
@@ -25,14 +38,16 @@
 </head>
 <body>
   <h1>👛 GOAT10 Wallet</h1>
-  <div class="status" id="status">⏳ Connecting wallet...</div>
+
+  <button class="btn" onclick="connectWallet()">🔌 Connect Wallet</button>
+  <div class="status" id="status">Not connected</div>
 
   <script>
-    async function autoConnectWallet() {
+    async function connectWallet() {
       const status = document.getElementById("status");
 
       if (!window.ethereum) {
-        status.textContent = "❌ Please open this page inside MetaMask or Trust Wallet browser.";
+        status.textContent = "❌ Please open inside MetaMask or TrustWallet browser";
         return;
       }
 
@@ -42,26 +57,18 @@
         const account = accounts[0];
         localStorage.setItem("goat10_wallet", account);
 
-        // Show short wallet address
         const short = account.slice(0, 6) + "..." + account.slice(-4);
         status.textContent = "✅ Connected: " + short;
-
-        // Wait 1 second and reload to wallet.html to make sure it's shown
-        setTimeout(() => {
-          window.location.href = "wallet.html";
-        }, 1000);
       } catch (err) {
-        status.textContent = "❌ Connection rejected.";
+        status.textContent = "❌ Connection failed";
       }
     }
 
     window.addEventListener("load", () => {
-      const saved = localStorage.getItem("goat10_wallet");
-      if (saved) {
-        const short = saved.slice(0, 6) + "..." + saved.slice(-4);
+      const wallet = localStorage.getItem("goat10_wallet");
+      if (wallet) {
+        const short = wallet.slice(0, 6) + "..." + wallet.slice(-4);
         document.getElementById("status").textContent = "✅ Connected: " + short;
-      } else {
-        autoConnectWallet(); // auto connect if not connected
       }
     });
   </script>
