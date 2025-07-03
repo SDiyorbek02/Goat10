@@ -87,7 +87,11 @@
     </button>
   </div>
 
-  <!-- Scripts -->
+  <!-- Tashqi sahifadan deep link orqali wallet ichida ochish -->
+<a href="https://metamask.app.link/dapp/goat10.vercel.app/wallet.html" class="btn">Open in MetaMask</a>
+<a href="https://link.trustwallet.com/open_url?coin_id=60&url=https%3A%2F%2Fgoat10.vercel.app%2Fwallet.html" class="btn">Open in Trust Wallet</a>
+  
+<!-- Scripts -->
   <script src="particles.js"></script>
   <script src="game.js"></script>
 
@@ -102,8 +106,8 @@
       } else {
         walletShort.textContent = "Wallet";
       }
-
-      const balance = localStorage.getItem("goat10_balance") || "0";
+    
+const balance = localStorage.getItem("goat10_balance") || "0";
       document.getElementById("balance").textContent = balance;
 
       const today = new Date().toISOString().split('T')[0];

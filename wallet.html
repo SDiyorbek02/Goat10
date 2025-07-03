@@ -7,11 +7,14 @@
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
   <style>
     body {
-      margin: 0; padding: 0;
+      margin: 0;
+      padding: 0;
       font-family: sans-serif;
       background: #0e0e0e;
       color: white;
-      display: flex; justify-content: center; align-items: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       height: 100vh;
     }
     .container {
@@ -33,10 +36,6 @@
       font-size: 16px;
       cursor: pointer;
       width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
       transition: background 0.3s;
     }
     .btn:hover {
@@ -55,32 +54,18 @@
 <body>
   <div class="container">
     <h1>👛 GOAT10 Wallet</h1>
-    <button class="btn" onclick="connectWallet('metamask')">
-      <img src="https://seeklogo.com/images/M/metamask-logo-09EDE53DBD-seeklogo.com.png" width="24" height="24">
-      Connect MetaMask
-    </button>
-    <button class="btn" onclick="connectWallet('trust')">
-      <img src="https://cryptologos.cc/logos/trust-wallet-token-trust-logo.png" width="24" height="24">
-      Connect Trust Wallet
-    </button>
+    <button class="btn" onclick="connectWallet()">🔌 Connect Wallet</button>
     <div class="status" id="status">❌ Wallet not connected</div>
     <button class="btn disconnect" id="disconnectBtn" onclick="disconnectWallet()">🔒 Disconnect</button>
   </div>
 
   <script>
-    const DAPP_URL = "https://goat10.vercel.app/wallet.html"; // To‘liq HTTPS bo‘lishi shart
     let web3;
     let account = null;
 
-    async function connectWallet(provider = 'metamask') {
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
+    async function connectWallet() {
       if (typeof window.ethereum === 'undefined') {
-        if (isMobile) {
-          openWalletApp(provider);
-        } else {
-          alert("MetaMask plaginini o‘rnating: https://metamask.io/download.html");
-        }
+        alert("❗ Wallet topilmadi. Iltimos, sahifani MetaMask yoki Trust Wallet ilovasining o‘zida oching.");
         return;
       }
 
@@ -91,21 +76,9 @@
         localStorage.setItem("goat10_wallet", account);
         updateUI(account);
       } catch (e) {
-        console.error("Ulanish rad etildi:", e);
-        alert("⛔ Foydalanuvchi walletga ulanishni rad etdi.");
+        console.error("Foydalanuvchi ulanishni rad etdi:", e);
+        alert("⛔ Walletga ulanish rad etildi.");
       }
-    }
-
-    function openWalletApp(provider) {
-      let link = "";
-
-      if (provider === 'metamask') {
-        link = https://metamask.app.link/dapp/${DAPP_URL.replace(/^https?:\/\//, '')};
-      } else if (provider === 'trust') {
-        link = https://link.trustwallet.com/open_url?coin_id=60&url=${encodeURIComponent(DAPP_URL)};
-      }
-
-      window.location.href = link;
     }
 
     function updateUI(addr) {
