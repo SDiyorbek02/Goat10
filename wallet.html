@@ -9,89 +9,69 @@
     body {
       margin: 0; padding: 0;
       font-family: sans-serif;
-      background: #0d0d0d;
-      color: #fff;
+      background: #0e0e0e;
+      color: white;
       display: flex; justify-content: center; align-items: center;
       height: 100vh;
     }
-    .wallet-container {
-      background: #1f1f1f;
+    .container {
+      text-align: center;
+      background: #1c1c1c;
       padding: 30px;
       border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.6);
-      text-align: center;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
       width: 90%;
       max-width: 400px;
     }
-    .wallet-title {
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
-    .wallet-btn {
-      background: #333;
+    .btn {
+      background: #444;
       color: white;
       border: none;
       padding: 12px 20px;
-      border-radius: 8px;
       margin: 10px 0;
-      cursor: pointer;
+      border-radius: 8px;
       font-size: 16px;
+      cursor: pointer;
+      width: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
       gap: 10px;
     }
-    .wallet-status {
+    .status {
       margin: 15px 0;
       font-size: 16px;
     }
-    .disconnect-btn {
-      background: #ff3333;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      margin-top: 10px;
-      cursor: pointer;
+    .disconnect {
+      background: #ff4444;
       display: none;
-    }
-    .back-btn {
-      margin-top: 15px;
-      color: #00aaff;
-      text-decoration: none;
-      display: inline-block;
     }
   </style>
 </head>
 <body>
-  <div class="wallet-container">
-    <h1 class="wallet-title">👛 GOAT10 Wallet</h1>
-
-    <button onclick="connectWallet('metamask')" class="wallet-btn">
-      <img src="https://seeklogo.com/images/M/metamask-logo-09EDE53DBD-seeklogo.com.png" width="24" height="24" />
-      <span>Connect with MetaMask</span>
+  <div class="container">
+    <h1>👛 GOAT10 Wallet</h1>
+    <button class="btn" onclick="connectWallet('metamask')">
+      <img src="https://seeklogo.com/images/M/metamask-logo-09EDE53DBD-seeklogo.com.png" width="24" height="24">
+      Connect MetaMask
     </button>
-
-    <button onclick="connectWallet('trust')" class="wallet-btn">
-      <img src="https://cryptologos.cc/logos/trust-wallet-token-trust-logo.png?v=032" width="24" height="24" />
-      <span>Connect with Trust Wallet</span>
+    <button class="btn" onclick="connectWallet('trust')">
+      <img src="https://cryptologos.cc/logos/trust-wallet-token-trust-logo.png" width="24" height="24">
+      Connect Trust Wallet
     </button>
-
-    <p id="walletStatus" class="wallet-status">❌ Wallet not connected</p>
-    <button id="disconnectBtn" class="disconnect-btn" onclick="disconnectWallet()">🔒 Disconnect</button>
-    <a href="main.html" class="back-btn">⬅️ Back to Game</a>
+    <div class="status" id="status">❌ Wallet not connected</div>
+    <button class="btn disconnect" id="disconnectBtn" onclick="disconnectWallet()">🔒 Disconnect</button>
   </div>
 
   <script>
-    const dappUrl = 'goat10.vercel.app/wallet.html'; // domeningiz
+    const DAPP_URL = "goat10.vercel.app/wallet.html"; // o'zingizning domeningiz
 
     let web3;
     let account = null;
 
-    async function connectWallet(provider) {
-      // Agar ilova mavjud bo'lmasa, deeplink orqali wallet ilovasini och
+    async function connectWallet(provider = 'metamask') {
       if (typeof window.ethereum === 'undefined') {
-        redirectToWalletApp(provider);
+        openWalletApp(provider);
         return;
       }
 
@@ -99,44 +79,50 @@
         web3 = new Web3(window.ethereum);
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         account = accounts[0];
-        localStorage.setItem('goat10_wallet', account);
+        localStorage.setItem("goat10_wallet", account);
         updateUI(account);
-      } catch (err) {
-        alert('Ulanmadi yoki foydalanuvchi bekor qildi.');
+      } catch (e) {
+        console.error("Wallet connection cancelled:", e);
+        alert("Foydalanuvchi walletga ulanishni rad etdi.");
       }
     }
 
-    function redirectToWalletApp(provider) {
-      let url = '';
+    function openWalletApp(provider) {
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+      let link = "";
+
       if (provider === 'metamask') {
-        url = https://metamask.app.link/dapp/${dappUrl};
+        link = https://metamask.app.link/dapp/${DAPP_URL};
       } else if (provider === 'trust') {
-        url = https://link.trustwallet.com/open_url?coin_id=60&url=https://${dappUrl};
+        link = https://link.trustwallet.com/open_url?coin_id=60&url=https://${DAPP_URL};
       }
-      window.location.href = url;
-    }
 
-    function disconnectWallet() {
-      account = null;
-      localStorage.removeItem('goat10_wallet');
-      updateUI(null);
+      window.location.href = link;
     }
 
     function updateUI(addr) {
-      const status = document.getElementById("walletStatus");
+      const status = document.getElementById("status");
       const disconnectBtn = document.getElementById("disconnectBtn");
+
       if (addr) {
-        const short = addr.slice(0, 6) + "..." + addr.slice(-4);
-        status.textContent = "✅ " + short;
-        disconnectBtn.style.display = "inline-block";
+        const short = addr.slice(0,6) + "..." + addr.slice(-4);
+        status.textContent = "✅ Connected: " + short;
+        disconnectBtn.style.display = "block";
       } else {
         status.textContent = "❌ Wallet not connected";
         disconnectBtn.style.display = "none";
       }
     }
 
-window.addEventListener('load', () => {
-      const saved = localStorage.getItem('goat10_wallet');
+    function disconnectWallet() {
+      account = null;
+      localStorage.removeItem("goat10_wallet");
+      updateUI(null);
+    }
+
+    window.addEventListener("load", () => {
+      const saved = localStorage.getItem("goat10_wallet");
       if (saved) {
         account = saved;
         updateUI(account);
