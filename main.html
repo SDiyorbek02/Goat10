@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GOAT10 Game</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
   <link rel="stylesheet" href="style.css" />
   <style>
     .coin-image {
@@ -26,7 +27,6 @@
       z-index: 20;
     }
 
-    /* 🔄 Button Animation */
     .menu-anim {
       transition: transform 0.2s ease, filter 0.2s ease;
     }
@@ -43,12 +43,12 @@
   <canvas id="particles" class="absolute top-0 left-0 w-full h-full -z-10"></canvas>
   <div class="silver-overlay"></div>
 
-  <!-- 🔝 Top Menu -->
+  <!-- Top Menu -->
   <div class="flex gap-6 mt-6 bg-black/80 px-6 py-3 rounded-xl shadow-lg z-10">
-    <a href="wallet.html" class="flex flex-col items-center justify-center text-white menu-anim">
+    <button onclick="connectWallet()" class="flex flex-col items-center justify-center text-white menu-anim">
       <div class="text-xl">👛</div>
-      <span id="walletShort" class="text-sm mt-1">Wallet</span>
-    </a>
+      <span id="walletShort" class="text-sm mt-1">Connect</span>
+    </button>
     <a href="leaderboard.html" class="flex flex-col items-center justify-center text-white menu-anim">
       <div class="text-xl">🏆</div>
       <span class="text-sm mt-1">Leaderboard</span>
@@ -59,19 +59,19 @@
     </div>
   </div>
 
-  <!-- 🪙 Coin -->
+  <!-- Coin -->
   <div class="relative flex flex-col items-center mt-6">
     <img src="goat10_coin.png" alt="GOAT10 Coin" class="coin-image" id="coin" />
     <div id="tap-result">+1</div>
 
-    <!-- ⚡️ Energy -->
+    <!-- Energy -->
     <div class="mt-4 text-lg font-bold">
       ⚡️ <span id="energy">500</span>
     </div>
     <div id="energy-wait" class="hidden text-xs mt-1 text-gray-400">24h Recharge 🔋</div>
   </div>
 
-  <!-- 🔻 Bottom Menu -->
+  <!-- Bottom Menu -->
   <div class="flex gap-6 mb-10 mt-8 bg-black/80 px-6 py-3 rounded-xl shadow-lg z-10">
     <button onclick="goToReferral()" class="flex flex-col items-center justify-center text-white menu-anim">
       <div class="text-xl">👥</div>
@@ -91,19 +91,36 @@
   <script src="particles.js"></script>
   <script src="game.js"></script>
 
-  <!-- ⚙️ Energy Logic -->
   <script>
+    async function connectWallet() {
+      if (!window.ethereum) {
+        alert("Please open this page in MetaMask or Trust Wallet browser.");
+        return;
+      }
+
+      try {
+        const web3 = new Web3(window.ethereum);
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        const account = accounts[0];
+        localStorage.setItem("goat10_wallet", account);
+
+        const short = account.slice(0, 6) + "..." + account.slice(-4);
+        document.getElementById("walletShort").textContent = short;
+      } catch (err) {
+        alert("Connection cancelled.");
+      }
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
       const walletAddress = localStorage.getItem("goat10_wallet");
       const walletShort = document.getElementById("walletShort");
-      if (walletAddress && walletShort) {
+
+if (walletAddress && walletShort) {
         const short = walletAddress.slice(0, 6) + "..." + walletAddress.slice(-4);
         walletShort.textContent = short;
-      } else {
-        walletShort.textContent = "Wallet";
       }
-    
-const balance = localStorage.getItem("goat10_balance") || "0";
+
+      const balance = localStorage.getItem("goat10_balance") || "0";
       document.getElementById("balance").textContent = balance;
 
       const today = new Date().toISOString().split('T')[0];
@@ -117,7 +134,7 @@ const balance = localStorage.getItem("goat10_balance") || "0";
       const energyVal = parseInt(localStorage.getItem("goat10_energy") || "0");
       document.getElementById("energy").textContent = energyVal;
 
-if (energyVal <= 0) {
+      if (energyVal <= 0) {
         document.getElementById("energy-wait").classList.remove("hidden");
       }
     });
