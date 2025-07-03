@@ -7,8 +7,7 @@
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
   <style>
     body {
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
       font-family: sans-serif;
       background: #0d1117;
       color: white;
@@ -70,7 +69,7 @@
 
     async function connectWallet() {
       if (!window.ethereum) {
-        alert("📱 Iltimos, sahifani MetaMask yoki Trust Wallet ilovasining brauzerida oching.");
+        alert("📱 Iltimos, sahifani MetaMask yoki Trust Wallet ilovasida oching.");
         return;
       }
 
@@ -82,10 +81,10 @@
         const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
         const account = accounts[0];
         const short = account.slice(0, 6) + "..." + account.slice(-4);
-        updateStatus'✅ Ulandi: <b>${short}</b><br>🔁 3 soniyadan so‘ng qaytiladi...';
+        updateStatus"✅ Ulandi: <b>${short}</b><br>🔁 3 soniyadan so‘ng qaytiladi...";
 
         setTimeout(() => {
-          window.location.href = "https://goat10.vercel.app"; // kerakli sahifaga qaytish manzili
+          window.location.href = "https://goat10.vercel.app"; // Qaytadigan sahifani shu yerda o‘zgartirasan
         }, 3000);
       } catch (err) {
         connectBtn.classList.remove("hidden");
@@ -102,15 +101,15 @@
 
           if (accounts.length > 0) {
             const account = accounts[0];
-            const short = account.slice(0,6) + "..." + account.slice(-4);
+            const short = account.slice(0, 6) + "..." + account.slice(-4);
             connectBtn.classList.add("hidden");
-            updateStatus'✅ Ulangan: <b>${short}</b><br>🔁 3 soniyadan so‘ng qaytiladi...';
+            updateStatus"✅ Ulangan: <b>${short}</b><br>🔁 3 soniyadan so‘ng qaytiladi...";
             setTimeout(() => {
-              window.location.href = "https://goat10.vercel.app"; // kerakli sahifaga qaytish manzili
+              window.location.href = "https://goat10.vercel.app"; // Qaytadigan sahifa
             }, 3000);
           }
         } catch (e) {
-          console.log("✅ Holat tekshirildi: ulanmagan.");
+          console.log("✅ Tekshiruv: Wallet ulangan emas.");
         }
       }
     });
