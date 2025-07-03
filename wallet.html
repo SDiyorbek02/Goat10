@@ -57,6 +57,7 @@
     .status {
       margin-top: 20px;
       font-size: 16px;
+      word-break: break-all;
     }
     img {
       border-radius: 4px;
@@ -67,28 +68,43 @@
   <div class="container">
     <h1>👛 GOAT10 Wallet</h1>
 
-    <!-- Deep Links to open in wallet apps -->
     <a class="btn" href="https://metamask.app.link/dapp/goat10.vercel.app/wallet.html">
       <img src="https://seeklogo.com/images/M/metamask-logo-09EDE53DBD-seeklogo.com.png" width="24" height="24">
-      MetaMask orqali kirish
+      Enter via MetaMask
     </a>
 
     <a class="btn" href="https://link.trustwallet.com/open_url?coin_id=60&url=https%3A%2F%2Fgoat10.vercel.app%2Fwallet.html">
       <img src="https://cryptologos.cc/logos/trust-wallet-token-trust-logo.png" width="24" height="24">
-      Trust Wallet orqali kirish
+      Enter via Trust Wallet
     </a>
 
-    <!-- Connect button inside wallet app browser -->
     <button class="btn connect-btn" onclick="connectWallet()">🔌 Connect Wallet</button>
-    <div class="status" id="status">❌ Wallet ulanmagan</div>
+    <div class="status" id="status">❌ Wallet not connected</div>
   </div>
 
   <script>
     let web3;
 
+    function updateStatus(account) {
+      const status = document.getElementById("status");
+      if (account) {
+        const short = account.slice(0, 6) + "..." + account.slice(-4);
+        status.textContent = "✅ Connected: " + short;
+
+        // ✅ Add address to URL if not already present
+        const url = new URL(window.location);
+        if (!url.searchParams.get("address")) {
+          url.searchParams.set("address", account);
+          window.history.replaceState({}, '', url.toString());
+        }
+      } else {
+        status.textContent = "❌ Wallet not connected";
+      }
+    }
+
     async function connectWallet() {
       if (!window.ethereum) {
-        alert("📱 Iltimos, sahifani MetaMask yoki Trust Wallet ilovasining brauzerida oching.");
+        alert("📱 Please open this page inside MetaMask or Trust Wallet browser.");
         return;
       }
 
@@ -99,34 +115,32 @@
         localStorage.setItem("goat10_wallet", account);
         updateStatus(account);
       } catch (err) {
-        alert("❌ Foydalanuvchi ulanishni rad etdi.");
-      }
-    }
-
-    function updateStatus(account) {
-      const status = document.getElementById("status");
-      if (account) {
-        const short = account.slice(0, 6) + "..." + account.slice(-4);
-        status.textContent = "✅ Ulandi: " + short;
-      } else {
-        status.textContent = "❌ Wallet ulanmagan";
+        alert("❌ Connection rejected.");
       }
     }
 
     window.addEventListener("load", async () => {
+      // Show address from localStorage or URL
+      const saved = localStorage.getItem("goat10_wallet");
+      const urlAddress = new URLSearchParams(window.location.search).get("address");
+
+      const showAccount = saved || urlAddress;
+
+      if (showAccount) {
+        updateStatus(showAccount);
+      }
+
       if (window.ethereum) {
         try {
           web3 = new Web3(window.ethereum);
           const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-          if (accounts.length > 0) {
+
+if (accounts.length > 0) {
             localStorage.setItem("goat10_wallet", accounts[0]);
             updateStatus(accounts[0]);
-          } else {
-            localStorage.removeItem("goat10_wallet");
-            updateStatus(null);
           }
         } catch (e) {
-          console.log("Wallet holati tekshirib bo‘lmadi:", e);
+          console.log("Wallet status error:", e);
         }
       }
     });
