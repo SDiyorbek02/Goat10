@@ -1,53 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>GOAT10 Wallet</title>
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
   <style>
     body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
       background: #0d1117;
       color: white;
-      font-family: sans-serif;
       display: flex;
-      flex-direction: column;
-      align-items: center;
       justify-content: center;
+      align-items: center;
+      flex-direction: column;
       height: 100vh;
+    }
+    .container {
+      background: #161b22;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
       text-align: center;
+      width: 90%;
+      max-width: 400px;
+    }
+    h1 {
+      margin-bottom: 20px;
     }
     .btn {
-      background: #238636;
+      background: #444;
       color: white;
-      padding: 12px 20px;
+      padding: 14px;
+      font-size: 16px;
+      margin: 10px 0;
       border: none;
       border-radius: 10px;
-      font-size: 16px;
+      width: 100%;
       cursor: pointer;
-      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-decoration: none;
     }
     .btn:hover {
+      background: #666;
+    }
+    .connect-btn {
+      background: #238636;
+    }
+    .connect-btn:hover {
       background: #2ea043;
     }
     .status {
       margin-top: 20px;
-      font-size: 18px;
+      font-size: 16px;
+    }
+    img {
+      border-radius: 4px;
     }
   </style>
 </head>
 <body>
-  <h1>👛 GOAT10 Wallet</h1>
+  <div class="container">
+    <h1>👛 GOAT10 Wallet</h1>
 
-  <button class="btn" onclick="connectWallet()">🔌 Connect Wallet</button>
-  <div class="status" id="status">Not connected</div>
+    <!-- Wallet deep links for mobile apps -->
+    <a class="btn" href="https://metamask.app.link/dapp/goat10.vercel.app/wallet.html">
+      <img src="https://seeklogo.com/images/M/metamask-logo-09EDE53DBD-seeklogo.com.png" width="24" height="24">
+      Open in MetaMask
+    </a>
+
+    <a class="btn" href="https://link.trustwallet.com/open_url?coin_id=60&url=https%3A%2F%2Fgoat10.vercel.app%2Fwallet.html">
+      <img src="https://cryptologos.cc/logos/trust-wallet-token-trust-logo.png" width="24" height="24">
+      Open in Trust Wallet
+    </a>
+
+    <button class="btn connect-btn" onclick="connectWallet()">🔌 Connect Wallet</button>
+    <div class="status" id="status">❌ Wallet not connected</div>
+  </div>
 
   <script>
     async function connectWallet() {
       const status = document.getElementById("status");
 
       if (!window.ethereum) {
-        status.textContent = "❌ Please open inside MetaMask or TrustWallet browser";
+        status.textContent = "❌ Please open this page inside MetaMask or Trust Wallet browser.";
         return;
       }
 
@@ -59,16 +100,23 @@
 
         const short = account.slice(0, 6) + "..." + account.slice(-4);
         status.textContent = "✅ Connected: " + short;
+
+        // OPTIONAL: refresh page so that wallet is shown again automatically
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } catch (err) {
-        status.textContent = "❌ Connection failed";
+        status.textContent = "❌ Connection rejected by user.";
       }
     }
 
     window.addEventListener("load", () => {
+      const status = document.getElementById("status");
       const wallet = localStorage.getItem("goat10_wallet");
+
       if (wallet) {
         const short = wallet.slice(0, 6) + "..." + wallet.slice(-4);
-        document.getElementById("status").textContent = "✅ Connected: " + short;
+        status.textContent = "✅ Connected: " + short;
       }
     });
   </script>
