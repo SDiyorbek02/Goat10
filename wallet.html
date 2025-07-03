@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GOAT10 Wallet</title>
-  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
-  <style>
-    body {
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GOAT10 Wallet</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <style>
+    body {
       margin: 0; padding: 0;
       font-family: sans-serif;
       background: #0d1117;
@@ -16,7 +16,7 @@
       align-items: center;
       flex-direction: column;
       height: 100vh;
-   }
+    }
     .container {
       background: #161b22;
       padding: 30px;
@@ -64,69 +64,62 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>👛 GOAT10 Wallet</h1>
+  <div class="container">
+    <h1>👛 GOAT10 Wallet</h1>
 
-    <!-- Deep Links to open in wallet apps -->
-    <a class="btn" href="https://metamask.app.link/dapp/goat10.vercel.app/wallet.html">
-      <img src="https://seeklogo.com/images/M/metamask-logo-09EDE53DBD-seeklogo.com.png" width="24" height="24">
-      MetaMask orqali kirish
-    </a>
+    <!-- Deep Links -->
+    <a class="btn" href="https://metamask.app.link/dapp/goat10.vercel.app/wallet.html">
+      <img src="https://seeklogo.com/images/M/metamask-logo-09EDE53DBD-seeklogo.com.png" width="24" height="24">
+      Connect via MetaMask
+    </a>
 
-    <a class="btn" href="https://link.trustwallet.com/open_url?coin_id=60&url=https%3A%2F%2Fgoat10.vercel.app%2Fwallet.html">
-      <img src="https://cryptologos.cc/logos/trust-wallet-token-trust-logo.png" width="24" height="24">
-      Trust Wallet orqali kirish
-    </a>
+    <a class="btn" href="https://link.trustwallet.com/open_url?coin_id=60&url=https%3A%2F%2Fgoat10.vercel.app%2Fwallet.html">
+      <img src="https://cryptologos.cc/logos/trust-wallet-token-trust-logo.png" width="24" height="24">
+      Connect via Trust Wallet
+    </a>
 
-    <!-- Connect button inside wallet app browser -->
-    <button class="btn connect-btn" onclick="connectWallet()">🔌 Connect Wallet</button>
-    <div class="status" id="status">❌ Wallet not connected</div>
-  </div>
+    <!-- Connect button -->
+    <button class="btn connect-btn" onclick="connectWallet()">🔌 Connect Wallet</button>
+    <div class="status" id="status">❌ Wallet not connected</div>
+  </div>
 
-  <script>
-    let web3;
+  <script>
+    let web3;
 
-    async function connectWallet() {
-      if (!window.ethereum) {
-        alert("📱 Please open this page inside MetaMask or Trust Wallet browser.");
-        return;
-      }
+    async function connectWallet() {
+      if (!window.ethereum) {
+        alert("📱 Please open this page inside MetaMask or Trust Wallet browser.");
+        return;
+      }
 
-      try {
-        web3 = new Web3(window.ethereum);
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const account = accounts[0];
-        localStorage.setItem("goat10_wallet", account);
-        updateStatus(account);
+      try {
+        web3 = new Web3(window.ethereum);
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const account = accounts[0];
+        localStorage.setItem("goat10_wallet", account);
+        updateStatus(account);
+      } catch (err) {
+        alert("❌ Connection rejected.");
+      }
+    }
 
-        // Refresh page to show status after connect
-        setTimeout(() => {
-          window.location.href = "wallet.html";
-        }, 500);
+    function updateStatus(account) {
+      const status = document.getElementById("status");
+      if (account) {
+        const short = account.slice(0, 6) + "..." + account.slice(-4);
+        status.textContent = "✅ Connected: " + short;
+      } else {
+        status.textContent = "❌ Wallet not connected";
+      }
+    }
 
-      } catch (err) {
-        alert("❌ Connection rejected.");
-      }
-    }
-
-    function updateStatus(account) {
-      const status = document.getElementById("status");
-      if (account) {
-        const short = account.slice(0, 6) + "..." + account.slice(-4);
-        status.textContent = "✅ Connected: " + short;
-      } else {
-        status.textContent = "❌ Wallet not connected";
-      }
-    }
-
-    window.addEventListener("load", () => {
-      const wallet = localStorage.getItem("goat10_wallet");
-      if (wallet) {
-        updateStatus(wallet);
-      } else {
-        updateStatus(null);
-      }
-    });
-  </script>
+    // Har safar sahifa yuklanganda wallet manzilini ko‘rsatish
+    window.addEventListener("DOMContentLoaded", () => {
+      const savedWallet = localStorage.getItem("goat10_wallet");
+      if (savedWallet) {
+        updateStatus(savedWallet);
+      }
+    });
+  </script>
 </body>
 </html>
