@@ -7,73 +7,59 @@
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      font-family: "Segoe UI", sans-serif;
-      background: linear-gradient(135deg, #000, #1c1c1c);
-      color: #ffffff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      margin: 0; padding: 0;
+      font-family: sans-serif;
+      background: #0d0d0d;
+      color: #fff;
+      display: flex; justify-content: center; align-items: center;
       height: 100vh;
     }
     .wallet-container {
       background: #1f1f1f;
       padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.6);
+      text-align: center;
       width: 90%;
       max-width: 400px;
-      text-align: center;
     }
     .wallet-title {
-      font-size: 26px;
-      margin-bottom: 25px;
-      background: linear-gradient(45deg, #f1c40f, #e67e22);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      font-size: 24px;
+      margin-bottom: 20px;
     }
-    .wallet-options {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      margin-bottom: 25px;
-   }
     .wallet-btn {
       background: #333;
+      color: white;
       border: none;
-      color: #fff;
-      padding: 12px 18px;
-      border-radius: 10px;
-      font-size: 16px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      margin: 10px 0;
       cursor: pointer;
+      font-size: 16px;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       gap: 10px;
     }
     .wallet-status {
+      margin: 15px 0;
       font-size: 16px;
-      margin-bottom: 20px;
     }
     .disconnect-btn {
-      background: #ff3b3b;
+      background: #ff3333;
       color: white;
       padding: 10px 20px;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
+      margin-top: 10px;
       cursor: pointer;
-      font-size: 14px;
-    }
-    .disconnect-btn.hidden {
       display: none;
     }
     .back-btn {
-      margin-top: 20px;
-      display: inline-block;
-      color: #00afff;
+      margin-top: 15px;
+      color: #00aaff;
       text-decoration: none;
-      font-size: 14px;
+      display: inline-block;
     }
   </style>
 </head>
@@ -81,87 +67,81 @@
   <div class="wallet-container">
     <h1 class="wallet-title">👛 GOAT10 Wallet</h1>
 
-    <div class="wallet-options">
-      <button onclick="connectWallet('metamask')" class="wallet-btn">
-        <img src="https://seeklogo.com/images/M/metamask-logo-09EDE53DBD-seeklogo.com.png" alt="MetaMask" width="24" height="24">
-        <span>MetaMask</span>
-      </button>
-      <button onclick="connectWallet('trust')" class="wallet-btn">
-        <img src="https://cryptologos.cc/logos/trust-wallet-token-trust-logo.png?v=032" alt="Trust Wallet" width="24" height="24">
-        <span>Trust Wallet</span>
-      </button>
-    </div>
+    <button onclick="connectWallet('metamask')" class="wallet-btn">
+      <img src="https://seeklogo.com/images/M/metamask-logo-09EDE53DBD-seeklogo.com.png" width="24" height="24" />
+      <span>Connect with MetaMask</span>
+    </button>
 
-    <p id="walletStatus" class="wallet-status">❌ Wallet not connected</p>
-    <button onclick="disconnectWallet()" id="disconnectBtn" class="disconnect-btn hidden">🔒 Disconnect</button>
-    <a href="main.html" class="back-btn">⬅️ Back to Game</a>
-  </div>
+    <button onclick="connectWallet('trust')" class="wallet-btn">
+      <img src="https://cryptologos.cc/logos/trust-wallet-token-trust-logo.png?v=032" width="24" height="24" />
+      <span>Connect with Trust Wallet</span>
+    </button>
 
-<script>
-const DAPP_URL = "goat10.vercel.app/wallet.html"; // sizning sayt manzilingiz
-let web3;
-let account = null;
+    <p id="walletStatus" class="wallet-status">❌ Wallet not connected</p>
+    <button id="disconnectBtn" class="disconnect-btn" onclick="disconnectWallet()">🔒 Disconnect</button>
+    <a href="main.html" class="back-btn">⬅️ Back to Game</a>
+  </div>
 
-async function connectWallet(provider = 'metamask') {
-  if (typeof window.ethereum === 'undefined') {
-    redirectToWalletApp(provider);
-    return;
-  }
+  <script>
+    const dappUrl = 'goat10.vercel.app/wallet.html'; // domeningiz
 
-  try {
-    web3 = new Web3(window.ethereum);
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    account = accounts[0];
-    updateUI(account);
-    localStorage.setItem('goat10_wallet', account);
-  } catch (err) {
-    alert("Ulanmadi yoki foydalanuvchi bekor qildi.");
-    console.error(err);
-  }
-}
+    let web3;
+    let account = null;
 
-function redirectToWalletApp(provider) {
-  const isAndroid = /Android/i.test(navigator.userAgent);
-  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    async function connectWallet(provider) {
+      // Agar ilova mavjud bo'lmasa, deeplink orqali wallet ilovasini och
+      if (typeof window.ethereum === 'undefined') {
+        redirectToWalletApp(provider);
+        return;
+      }
 
-  let deepLink = "";
+      try {
+        web3 = new Web3(window.ethereum);
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        account = accounts[0];
+        localStorage.setItem('goat10_wallet', account);
+        updateUI(account);
+      } catch (err) {
+        alert('Ulanmadi yoki foydalanuvchi bekor qildi.');
+      }
+    }
 
-  if (provider === "metamask") {
-    deepLink = https://metamask.app.link/dapp/${DAPP_URL};
-  } else if (provider === "trust") {
-    deepLink = https://link.trustwallet.com/open_url?coin_id=60&url=https://${DAPP_URL};
-  }
+    function redirectToWalletApp(provider) {
+      let url = '';
+      if (provider === 'metamask') {
+        url = https://metamask.app.link/dapp/${dappUrl};
+      } else if (provider === 'trust') {
+        url = https://link.trustwallet.com/open_url?coin_id=60&url=https://${dappUrl};
+      }
+      window.location.href = url;
+    }
 
-  window.location.href = deepLink;
-}
+    function disconnectWallet() {
+      account = null;
+      localStorage.removeItem('goat10_wallet');
+      updateUI(null);
+    }
 
-function disconnectWallet() {
-  account = null;
-  localStorage.removeItem('goat10_wallet');
-  updateUI(null);
-}
-
-function updateUI(address) {
-  const status = document.getElementById("walletStatus");
-  const btn = document.getElementById("disconnectBtn");
-
-  if (address) {
-    const short = address.slice(0, 6) + "..." + address.slice(-4);
-    status.textContent = "✅ " + short;
-    btn.classList.remove("hidden");
-  } else {
-    status.textContent = "❌ Wallet not connected";
-    btn.classList.add("hidden");
-  }
-}
+    function updateUI(addr) {
+      const status = document.getElementById("walletStatus");
+      const disconnectBtn = document.getElementById("disconnectBtn");
+      if (addr) {
+        const short = addr.slice(0, 6) + "..." + addr.slice(-4);
+        status.textContent = "✅ " + short;
+        disconnectBtn.style.display = "inline-block";
+      } else {
+        status.textContent = "❌ Wallet not connected";
+        disconnectBtn.style.display = "none";
+      }
+    }
 
 window.addEventListener('load', () => {
-  const saved = localStorage.getItem('goat10_wallet');
-  if (saved) {
-    account = saved;
-    updateUI(account);
-  }
-});
-</script>
+      const saved = localStorage.getItem('goat10_wallet');
+      if (saved) {
+        account = saved;
+        updateUI(account);
+      }
+    });
+  </script>
 </body>
 </html>
