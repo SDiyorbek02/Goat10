@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>GOAT10 Wallet</title>
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
@@ -45,9 +45,7 @@
       gap: 10px;
       text-decoration: none;
     }
-    .btn:hover {
-      background: #666;
-    }
+    .btn:hover { background: #666; }
     .connect-btn {
       background: #238636;
     }
@@ -55,7 +53,7 @@
       background: #2ea043;
     }
     .status {
-      margin-top: 20px;
+      margin-top: 15px;
       font-size: 16px;
     }
     img {
@@ -67,18 +65,17 @@
   <div class="container">
     <h1>👛 GOAT10 Wallet</h1>
 
-    <!-- Deep Links to open in wallet apps -->
+    <!-- Deep Link tugmalar -->
     <a class="btn" href="https://metamask.app.link/dapp/goat10.vercel.app/wallet.html">
       <img src="https://seeklogo.com/images/M/metamask-logo-09EDE53DBD-seeklogo.com.png" width="24" height="24">
-      MetaMask orqali kirish
+      MetaMask orqali ochish
     </a>
-
     <a class="btn" href="https://link.trustwallet.com/open_url?coin_id=60&url=https%3A%2F%2Fgoat10.vercel.app%2Fwallet.html">
       <img src="https://cryptologos.cc/logos/trust-wallet-token-trust-logo.png" width="24" height="24">
-      Trust Wallet orqali kirish
+      Trust Wallet orqali ochish
     </a>
 
-    <!-- Connect button inside wallet app browser -->
+    <!-- Connect Wallet tugmasi -->
     <button class="btn connect-btn" onclick="connectWallet()">🔌 Connect Wallet</button>
     <div class="status" id="status">❌ Wallet ulanmagan</div>
   </div>
@@ -99,7 +96,7 @@
         localStorage.setItem("goat10_wallet", account);
         updateStatus(account);
       } catch (err) {
-        alert("❌ Foydalanuvchi ulanishni rad etdi.");
+        alert("❌ Wallet ulanmadi: foydalanuvchi ulanishni rad etdi.");
       }
     }
 
@@ -115,18 +112,32 @@
 
     window.addEventListener("load", async () => {
       if (window.ethereum) {
+        web3 = new Web3(window.ethereum);
+
         try {
-          web3 = new Web3(window.ethereum);
-          const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+          const accounts = await window.ethereum.request({ method: "eth_accounts" });
           if (accounts.length > 0) {
-            localStorage.setItem("goat10_wallet", accounts[0]);
-            updateStatus(accounts[0]);
+            const account = accounts[0];
+            localStorage.setItem("goat10_wallet", account);
+            updateStatus(account);
           } else {
             localStorage.removeItem("goat10_wallet");
             updateStatus(null);
           }
-        } catch (e) {
-          console.log("Wallet holati tekshirib bo‘lmadi:", e);
+
+          // Agar foydalanuvchi wallet'ni almashtirsa yoki chiqsa
+          window.ethereum.on("accountsChanged", (accounts) => {
+            if (accounts.length > 0) {
+              localStorage.setItem("goat10_wallet", accounts[0]);
+              updateStatus(accounts[0]);
+            } else {
+              localStorage.removeItem("goat10_wallet");
+              updateStatus(null);
+            }
+          });
+
+} catch (e) {
+          console.log("❌ Wallet holati tekshirib bo‘lmadi:", e);
         }
       }
     });
