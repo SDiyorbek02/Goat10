@@ -10,7 +10,7 @@
       margin: 0;
       padding: 0;
       font-family: sans-serif;
-      background: #0e0e0e;
+      background: #0d1117;
       color: white;
       display: flex;
       justify-content: center;
@@ -19,34 +19,37 @@
     }
     .container {
       text-align: center;
-      background: #1c1c1c;
+      background: #161b22;
       padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
       width: 90%;
       max-width: 400px;
     }
+    h1 {
+      margin-bottom: 20px;
+    }
     .btn {
-      background: #444;
+      background: #238636;
       color: white;
       border: none;
-      padding: 12px 20px;
+      padding: 15px 20px;
       margin: 10px 0;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 16px;
       cursor: pointer;
       width: 100%;
       transition: background 0.3s;
     }
     .btn:hover {
-      background: #666;
+      background: #2ea043;
     }
     .status {
-      margin: 15px 0;
+      margin: 20px 0 10px;
       font-size: 16px;
     }
     .disconnect {
-      background: #ff4444;
+      background: #f85149;
       display: none;
     }
   </style>
@@ -55,8 +58,8 @@
   <div class="container">
     <h1>👛 GOAT10 Wallet</h1>
     <button class="btn" onclick="connectWallet()">🔌 Connect Wallet</button>
-    <div class="status" id="status">❌ Wallet not connected</div>
-    <button class="btn disconnect" id="disconnectBtn" onclick="disconnectWallet()">🔒 Disconnect</button>
+    <div class="status" id="status">❌ Wallet ulanmagan</div>
+    <button class="btn disconnect" id="disconnectBtn" onclick="disconnectWallet()">🔒 Ulanishni bekor qilish</button>
   </div>
 
   <script>
@@ -64,8 +67,8 @@
     let account = null;
 
     async function connectWallet() {
-      if (typeof window.ethereum === 'undefined') {
-        alert("❗ Wallet topilmadi. Iltimos, sahifani MetaMask yoki Trust Wallet ilovasining o‘zida oching.");
+      if (!window.ethereum) {
+        alert("❗ Iltimos, sahifani MetaMask yoki Trust Wallet ilovasining ichida oching.");
         return;
       }
 
@@ -75,9 +78,9 @@
         account = accounts[0];
         localStorage.setItem("goat10_wallet", account);
         updateUI(account);
-      } catch (e) {
-        console.error("Foydalanuvchi ulanishni rad etdi:", e);
-        alert("⛔ Walletga ulanish rad etildi.");
+      } catch (error) {
+        console.log("Ulanish rad etildi:", error);
+        alert("⛔ Ulanish rad etildi.");
       }
     }
 
@@ -87,10 +90,10 @@
 
       if (addr) {
         const short = addr.slice(0, 6) + "..." + addr.slice(-4);
-        status.textContent = "✅ Connected: " + short;
+        status.textContent = "✅ Ulandi: " + short;
         disconnectBtn.style.display = "block";
       } else {
-        status.textContent = "❌ Wallet not connected";
+        status.textContent = "❌ Wallet ulanmagan";
         disconnectBtn.style.display = "none";
       }
     }
