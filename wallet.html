@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>GOAT10 Wallet</title>
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
   <style>
     body {
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
       font-family: sans-serif;
       background: #0d1117;
       color: white;
@@ -27,68 +26,33 @@
       width: 90%;
       max-width: 400px;
     }
-    h1 {
-      margin-bottom: 20px;
-    }
     .btn {
-      background: #444;
-      color: white;
+      background: #238636;
       padding: 14px;
       font-size: 16px;
-      margin: 10px 0;
+      margin-top: 15px;
       border: none;
       border-radius: 10px;
-      width: 100%;
+      color: white;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      text-decoration: none;
-    }
-    .btn:hover {
-      background: #666;
-    }
-    .connect-btn {
-      background: #238636;
-    }
-    .connect-btn:hover {
-      background: #2ea043;
     }
     .status {
       margin-top: 20px;
       font-size: 16px;
-    }
-    img {
-      border-radius: 4px;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>👛 GOAT10 Wallet</h1>
-
-    <!-- Wallet deep links for mobile apps -->
-    <a class="btn" href="https://metamask.app.link/dapp/goat10.vercel.app/wallet.html">
-      <img src="https://seeklogo.com/images/M/metamask-logo-09EDE53DBD-seeklogo.com.png" width="24" height="24">
-      Open in MetaMask
-    </a>
-
-    <a class="btn" href="https://link.trustwallet.com/open_url?coin_id=60&url=https%3A%2F%2Fgoat10.vercel.app%2Fwallet.html">
-      <img src="https://cryptologos.cc/logos/trust-wallet-token-trust-logo.png" width="24" height="24">
-      Open in Trust Wallet
-    </a>
-
-    <button class="btn connect-btn" onclick="connectWallet()">🔌 Connect Wallet</button>
+    <button class="btn" onclick="connectWallet()">🔌 Connect Wallet</button>
     <div class="status" id="status">❌ Wallet not connected</div>
   </div>
 
   <script>
     async function connectWallet() {
-      const status = document.getElementById("status");
-
       if (!window.ethereum) {
-        status.textContent = "❌ Please open this page inside MetaMask or Trust Wallet browser.";
+        alert("Please open this page in MetaMask or Trust Wallet browser.");
         return;
       }
 
@@ -96,29 +60,26 @@
         const web3 = new Web3(window.ethereum);
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const account = accounts[0];
-        localStorage.setItem("goat10_wallet", account);
-
-        const short = account.slice(0, 6) + "..." + account.slice(-4);
-        status.textContent = "✅ Connected: " + short;
-
-        // OPTIONAL: refresh page so that wallet is shown again automatically
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
+        // URL ga account manzilini qo‘shib qayta yuklash
+        window.location.href = 'wallet.html?wallet=${account};'
       } catch (err) {
-        status.textContent = "❌ Connection rejected by user.";
+        alert("❌ Connection failed.");
       }
     }
 
-    window.addEventListener("load", () => {
-      const status = document.getElementById("status");
-      const wallet = localStorage.getItem("goat10_wallet");
+    // URLdan wallet manzilini o‘qish
+    function getWalletFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("wallet");
+    }
 
-      if (wallet) {
-        const short = wallet.slice(0, 6) + "..." + wallet.slice(-4);
-        status.textContent = "✅ Connected: " + short;
-      }
-    });
+    // Ulangan manzilni ko‘rsatish
+    const wallet = getWalletFromURL();
+    const status = document.getElementById("status");
+    if (wallet) {
+      const short = wallet.slice(0, 6) + "..." + wallet.slice(-4);
+      status.textContent = "✅ Connected: " + short;
+    }
   </script>
 </body>
 </html>
