@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uz">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -7,81 +7,66 @@
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
   <style>
     body {
-      margin: 0; padding: 0;
+      margin: 0;
+      padding: 0;
       font-family: sans-serif;
       background: #0d1117;
       color: white;
       display: flex;
       justify-content: center;
       align-items: center;
-      flex-direction: column;
       height: 100vh;
     }
     .container {
       background: #161b22;
       padding: 30px;
       border-radius: 16px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
       text-align: center;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
       width: 90%;
       max-width: 400px;
     }
-    h1 {
+    h2 {
       margin-bottom: 20px;
     }
     .btn {
-      background: #444;
+      background: #238636;
       color: white;
+      border: none;
       padding: 14px;
       font-size: 16px;
-      margin: 10px 0;
-      border: none;
       border-radius: 10px;
       width: 100%;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      text-decoration: none;
     }
-    .btn:hover { background: #666; }
-    .connect-btn {
-      background: #238636;
-    }
-    .connect-btn:hover {
+    .btn:hover {
       background: #2ea043;
     }
     .status {
-      margin-top: 15px;
+      margin-top: 20px;
       font-size: 16px;
     }
-    img {
-      border-radius: 4px;
+    .hidden {
+      display: none;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>👛 GOAT10 Wallet</h1>
-
-    <!-- Deep Link tugmalar -->
-    <a class="btn" href="https://metamask.app.link/dapp/goat10.vercel.app/wallet.html">
-      <img src="https://seeklogo.com/images/M/metamask-logo-09EDE53DBD-seeklogo.com.png" width="24" height="24">
-      MetaMask orqali ochish
-    </a>
-    <a class="btn" href="https://link.trustwallet.com/open_url?coin_id=60&url=https%3A%2F%2Fgoat10.vercel.app%2Fwallet.html">
-      <img src="https://cryptologos.cc/logos/trust-wallet-token-trust-logo.png" width="24" height="24">
-      Trust Wallet orqali ochish
-    </a>
-
-    <!-- Connect Wallet tugmasi -->
-    <button class="btn connect-btn" onclick="connectWallet()">🔌 Connect Wallet</button>
-    <div class="status" id="status">❌ Wallet ulanmagan</div>
+    <h2>👛 GOAT10 Wallet</h2>
+    <button class="btn" id="connectBtn" onclick="connectWallet()">🔌 Connect Wallet</button>
+    <div class="status hidden" id="status">⏳ Tekshirilmoqda...</div>
   </div>
 
   <script>
+    const connectBtn = document.getElementById("connectBtn");
+    const statusDiv = document.getElementById("status");
     let web3;
+
+    function updateStatus(text) {
+      statusDiv.innerHTML = text;
+      statusDiv.classList.remove("hidden");
+    }
 
     async function connectWallet() {
       if (!window.ethereum) {
@@ -91,53 +76,41 @@
 
       try {
         web3 = new Web3(window.ethereum);
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const account = accounts[0];
-        localStorage.setItem("goat10_wallet", account);
-        updateStatus(account);
-      } catch (err) {
-        alert("❌ Wallet ulanmadi: foydalanuvchi ulanishni rad etdi.");
-      }
-    }
+        connectBtn.classList.add("hidden");
+        updateStatus("⏳ Ulanmoqda...");
 
-    function updateStatus(account) {
-      const status = document.getElementById("status");
-      if (account) {
+        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+        const account = accounts[0];
         const short = account.slice(0, 6) + "..." + account.slice(-4);
-        status.textContent = "✅ Ulandi: " + short;
-      } else {
-        status.textContent = "❌ Wallet ulanmagan";
+        updateStatus'✅ Ulandi: <b>${short}</b><br>🔁 3 soniyadan so‘ng qaytiladi...';
+
+        setTimeout(() => {
+          window.location.href = "https://goat10.vercel.app"; // kerakli sahifaga qaytish manzili
+        }, 3000);
+      } catch (err) {
+        connectBtn.classList.remove("hidden");
+        statusDiv.classList.add("hidden");
+        alert("❌ Ulanish bekor qilindi.");
       }
     }
 
     window.addEventListener("load", async () => {
       if (window.ethereum) {
-        web3 = new Web3(window.ethereum);
-
         try {
+          web3 = new Web3(window.ethereum);
           const accounts = await window.ethereum.request({ method: "eth_accounts" });
+
           if (accounts.length > 0) {
             const account = accounts[0];
-            localStorage.setItem("goat10_wallet", account);
-            updateStatus(account);
-          } else {
-            localStorage.removeItem("goat10_wallet");
-            updateStatus(null);
+            const short = account.slice(0,6) + "..." + account.slice(-4);
+            connectBtn.classList.add("hidden");
+            updateStatus'✅ Ulangan: <b>${short}</b><br>🔁 3 soniyadan so‘ng qaytiladi...';
+            setTimeout(() => {
+              window.location.href = "https://goat10.vercel.app"; // kerakli sahifaga qaytish manzili
+            }, 3000);
           }
-
-          // Agar foydalanuvchi wallet'ni almashtirsa yoki chiqsa
-          window.ethereum.on("accountsChanged", (accounts) => {
-            if (accounts.length > 0) {
-              localStorage.setItem("goat10_wallet", accounts[0]);
-              updateStatus(accounts[0]);
-            } else {
-              localStorage.removeItem("goat10_wallet");
-              updateStatus(null);
-            }
-          });
-
-} catch (e) {
-          console.log("❌ Wallet holati tekshirib bo‘lmadi:", e);
+        } catch (e) {
+          console.log("✅ Holat tekshirildi: ulanmagan.");
         }
       }
     });
