@@ -7,79 +7,63 @@
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      font-family: sans-serif;
       background: #0d1117;
       color: white;
+      font-family: sans-serif;
       display: flex;
-      justify-content: center;
-      align-items: center;
       flex-direction: column;
+      align-items: center;
+      justify-content: center;
       height: 100vh;
-    }
-    .container {
-      background: #161b22;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
       text-align: center;
-      width: 90%;
-      max-width: 400px;
-    }
-    h1 {
-      margin-bottom: 20px;
     }
     .status {
       margin-top: 20px;
-      font-size: 16px;
+      font-size: 18px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>👛 GOAT10 Wallet</h1>
-    <div class="status" id="status">🔄 Connecting...</div>
-  </div>
+  <h1>👛 GOAT10 Wallet</h1>
+  <div class="status" id="status">⏳ Connecting wallet...</div>
 
   <script>
-    async function connectAndRedirect() {
+    async function autoConnectWallet() {
       const status = document.getElementById("status");
 
       if (!window.ethereum) {
-        status.textContent = "❌ Please use MetaMask or Trust Wallet browser.";
+        status.textContent = "❌ Please open this page inside MetaMask or Trust Wallet browser.";
         return;
       }
 
       try {
         const web3 = new Web3(window.ethereum);
-
-        const accounts = await window.ethereum.request({
-          method: "eth_requestAccounts",
-        });
-
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const account = accounts[0];
         localStorage.setItem("goat10_wallet", account);
 
-        // Agar URL da redirect=1 bo'lsa, bu sahifa qayta ochilgan bo'ladi
-        const url = new URL(window.location.href);
-        const from = url.searchParams.get("from");
+        // Show short wallet address
+        const short = account.slice(0, 6) + "..." + account.slice(-4);
+        status.textContent = "✅ Connected: " + short;
 
-        if (!from) {
-          // Birinchi marta ulanayotgan bo‘lsa, sahifani qayta ochish
-          window.location.href = "wallet.html?from=connected";
-        } else {
-          // Qaytib kelganda wallet manzilini chiqarish
-          const short = account.slice(0, 6) + "..." + account.slice(-4);
-          status.textContent = "✅ Connected: " + short;
-        }
+        // Wait 1 second and reload to wallet.html to make sure it's shown
+        setTimeout(() => {
+          window.location.href = "wallet.html";
+        }, 1000);
       } catch (err) {
-        console.error(err);
-        status.textContent = "❌ Connection failed or denied.";
+        status.textContent = "❌ Connection rejected.";
       }
     }
 
-    window.addEventListener("load", connectAndRedirect);
+    window.addEventListener("load", () => {
+      const saved = localStorage.getItem("goat10_wallet");
+      if (saved) {
+        const short = saved.slice(0, 6) + "..." + saved.slice(-4);
+        document.getElementById("status").textContent = "✅ Connected: " + short;
+      } else {
+        autoConnectWallet(); // auto connect if not connected
+      }
+    });
   </script>
 </body>
 </html>
