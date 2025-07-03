@@ -37,6 +37,10 @@
       justify-content: center;
       align-items: center;
       gap: 10px;
+      transition: background 0.3s;
+    }
+    .btn:hover {
+      background: #666;
     }
     .status {
       margin: 15px 0;
@@ -64,14 +68,19 @@
   </div>
 
   <script>
-    const DAPP_URL = "goat10.vercel.app/wallet.html"; // o'zingizning domeningiz
-
+    const DAPP_URL = "https://goat10.vercel.app/wallet.html"; // To‘liq HTTPS bo‘lishi shart
     let web3;
     let account = null;
 
     async function connectWallet(provider = 'metamask') {
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
       if (typeof window.ethereum === 'undefined') {
-        openWalletApp(provider);
+        if (isMobile) {
+          openWalletApp(provider);
+        } else {
+          alert("MetaMask plaginini o‘rnating: https://metamask.io/download.html");
+        }
         return;
       }
 
@@ -82,20 +91,18 @@
         localStorage.setItem("goat10_wallet", account);
         updateUI(account);
       } catch (e) {
-        console.error("Wallet connection cancelled:", e);
-        alert("Foydalanuvchi walletga ulanishni rad etdi.");
+        console.error("Ulanish rad etildi:", e);
+        alert("⛔ Foydalanuvchi walletga ulanishni rad etdi.");
       }
     }
 
     function openWalletApp(provider) {
-      const isAndroid = /Android/i.test(navigator.userAgent);
-      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
       let link = "";
 
       if (provider === 'metamask') {
-        link = https://metamask.app.link/dapp/${DAPP_URL};
+        link = https://metamask.app.link/dapp/${DAPP_URL.replace(/^https?:\/\//, '')};
       } else if (provider === 'trust') {
-        link = https://link.trustwallet.com/open_url?coin_id=60&url=https://${DAPP_URL};
+        link = https://link.trustwallet.com/open_url?coin_id=60&url=${encodeURIComponent(DAPP_URL)};
       }
 
       window.location.href = link;
@@ -106,7 +113,7 @@
       const disconnectBtn = document.getElementById("disconnectBtn");
 
       if (addr) {
-        const short = addr.slice(0,6) + "..." + addr.slice(-4);
+        const short = addr.slice(0, 6) + "..." + addr.slice(-4);
         status.textContent = "✅ Connected: " + short;
         disconnectBtn.style.display = "block";
       } else {
