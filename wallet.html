@@ -1,54 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GOAT10 Wallet Info</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    .menu-anim {
-      transition: transform 0.2s ease, filter 0.2s ease;
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GOAT10 Wallet</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <style>
+    body {
+      margin: 0; padding: 0;
+      font-family: sans-serif;
+      background: #0d1117;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      height: 100vh;
+   }
+    .container {
+      background: #161b22;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
     }
-    .menu-anim:hover {
-      transform: scale(1.1);
-      filter: drop-shadow(0 0 10px #facc15);
+    h1 {
+      margin-bottom: 20px;
+    }
+    .btn {
+      background: #444;
+      color: white;
+      padding: 14px;
+      font-size: 16px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 10px;
+      width: 100%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .btn:hover {
+      background: #666;
+    }
+    .connect-btn {
+      background: #238636;
+    }
+    .connect-btn:hover {
+      background: #2ea043;
+    }
+    .status {
+      margin-top: 20px;
+      font-size: 16px;
+    }
+    img {
+      border-radius: 4px;
     }
   </style>
 </head>
-<body class="bg-black text-white min-h-screen flex items-center justify-center">
-  <div class="bg-[#161b22] p-6 rounded-xl shadow-xl text-center w-full max-w-md mx-auto">
+<body>
+  <div class="container">
+    <h1>👛 GOAT10 Wallet</h1>
 
-    <h1 class="text-2xl font-bold mb-4">👛 Wallet Address</h1>
+    <!-- Deep Links to open in wallet apps -->
+    <a class="btn" href="https://metamask.app.link/dapp/goat10.vercel.app/wallet.html">
+      <img src="https://seeklogo.com/images/M/metamask-logo-09EDE53DBD-seeklogo.com.png" width="24" height="24">
+      MetaMask orqali kirish
+    </a>
 
-    <div id="walletAddress" class="text-yellow-400 text-lg font-mono break-all mb-4">
-      Loading...
-    </div>
+    <a class="btn" href="https://link.trustwallet.com/open_url?coin_id=60&url=https%3A%2F%2Fgoat10.vercel.app%2Fwallet.html">
+      <img src="https://cryptologos.cc/logos/trust-wallet-token-trust-logo.png" width="24" height="24">
+      Trust Wallet orqali kirish
+    </a>
 
-    <button onclick="copyAddress()" class="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded menu-anim">
-      📋 Copy Address
-    </button>
+    <!-- Connect button inside wallet app browser -->
+    <button class="btn connect-btn" onclick="connectWallet()">🔌 Connect Wallet</button>
+    <div class="status" id="status">❌ Wallet not connected</div>
+  </div>
 
-    <p id="copyStatus" class="text-green-400 mt-3 hidden">✔️ Copied to clipboard!</p>
-  </div>
+  <script>
+    let web3;
 
-  <script>
-    const address = localStorage.getItem("goat10_wallet");
-    const walletDiv = document.getElementById("walletAddress");
-    const copyStatus = document.getElementById("copyStatus");
+    async function connectWallet() {
+      if (!window.ethereum) {
+        alert("📱 Please open this page inside MetaMask or Trust Wallet browser.");
+        return;
+      }
 
-    if (address) {
-      walletDiv.textContent = address;
-    } else {
-      walletDiv.textContent = "❌ Not connected.";
-    }
+      try {
+        web3 = new Web3(window.ethereum);
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const account = accounts[0];
+        localStorage.setItem("goat10_wallet", account);
+        updateStatus(account);
 
-    function copyAddress() {
-      if (!address) return;
-      navigator.clipboard.writeText(address).then(() => {
-        copyStatus.classList.remove("hidden");
-        setTimeout(() => copyStatus.classList.add("hidden"), 2000);
-      });
-    }
-  </script>
+        // Refresh page to show status after connect
+        setTimeout(() => {
+          window.location.href = "wallet.html";
+        }, 500);
+
+      } catch (err) {
+        alert("❌ Connection rejected.");
+      }
+    }
+
+    function updateStatus(account) {
+      const status = document.getElementById("status");
+      if (account) {
+        const short = account.slice(0, 6) + "..." + account.slice(-4);
+        status.textContent = "✅ Connected: " + short;
+      } else {
+        status.textContent = "❌ Wallet not connected";
+      }
+    }
+
+    window.addEventListener("load", () => {
+      const wallet = localStorage.getItem("goat10_wallet");
+      if (wallet) {
+        updateStatus(wallet);
+      } else {
+        updateStatus(null);
+      }
+    });
+  </script>
 </body>
 </html>
