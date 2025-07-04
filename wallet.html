@@ -59,7 +59,7 @@
       font-size: 16px;
       word-break: break-word;
     }
-    #wallet-url {
+    #wallet-url, #wallet-url-file {
       margin-top: 10px;
       font-size: 14px;
       color: #58a6ff;
@@ -85,8 +85,12 @@
     </a>
 
     <button class="btn connect-btn" onclick="connectWallet()">🔌 Connect Wallet</button>
+
     <div class="status" id="status">❌ Wallet not connected</div>
     <div id="wallet-url"></div>
+
+    <!-- 🆕 Sahifa ichida URL ni ko‘rsatish -->
+    <div id="wallet-url-file"></div>
   </div>
 
   <script>
@@ -95,6 +99,7 @@
     function updateStatus(account) {
       const status = document.getElementById("status");
       const walletUrl = document.getElementById("wallet-url");
+      const walletUrlFile = document.getElementById("wallet-url-file");
 
       if (account) {
         const short = account.slice(0, 6) + "..." + account.slice(-4);
@@ -106,10 +111,12 @@
           window.history.replaceState({}, '', url.toString());
         }
 
-        walletUrl.innerHTML = '🔗 <b>Wallet URL:</b><br><a href="${url.toString()}" style="color:#58a6ff" target="_blank">${url.toString()}</a>;'
+        walletUrl.innerHTML = '🔗 <b>Wallet URL:</b><br><a href="' + url.toString() + '" style="color:#58a6ff" target="_blank">' + url.toString() + '</a>';
+        walletUrlFile.innerHTML = '📂 <b>Saved URL:</b><br><span style="color:#c9d1d9">' + url.toString() + '</span>'; // 🆕 URL’ni sahifa ichida chiqarish
       } else {
         status.textContent = "❌ Wallet not connected";
         walletUrl.innerHTML = '';
+        walletUrlFile.innerHTML = '';
       }
     }
 
@@ -130,7 +137,7 @@
       }
     }
 
-    window.addEventListener("load", async () => {
+window.addEventListener("load", async () => {
       const saved = localStorage.getItem("goat10_wallet");
       const urlAddress = new URLSearchParams(window.location.search).get("address");
       const showAccount = saved || urlAddress;
@@ -139,7 +146,7 @@
         updateStatus(showAccount);
       }
 
-if (window.ethereum) {
+      if (window.ethereum) {
         try {
           web3 = new Web3(window.ethereum);
           const accounts = await window.ethereum.request({ method: 'eth_accounts' });
