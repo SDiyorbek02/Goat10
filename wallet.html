@@ -1,165 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GOAT10 Wallet</title>
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
   <style>
     body {
-      margin: 0; padding: 0;
-      font-family: sans-serif;
       background: #0d1117;
       color: white;
+      font-family: sans-serif;
       display: flex;
-      justify-content: center;
-      align-items: center;
       flex-direction: column;
+      align-items: center;
+      justify-content: center;
       height: 100vh;
+      margin: 0;
+      text-align: center;
     }
-    .container {
+    .box {
       background: #161b22;
       padding: 30px;
       border-radius: 16px;
       box-shadow: 0 0 20px rgba(0,0,0,0.5);
-      text-align: center;
-      width: 90%;
-      max-width: 400px;
+      max-width: 90%;
+      width: 400px;
     }
     h1 {
       margin-bottom: 20px;
     }
-    .btn {
-      background: #444;
-      color: white;
-      padding: 14px;
-      font-size: 16px;
-      margin: 10px 0;
-      border: none;
-      border-radius: 10px;
-      width: 100%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      text-decoration: none;
-    }
-    .btn:hover {
-      background: #666;
-    }
-    .connect-btn {
+    button {
       background: #238636;
+      color: white;
+      border: none;
+      padding: 14px 20px;
+      font-size: 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      width: 100%;
     }
-    .connect-btn:hover {
+    button:hover {
       background: #2ea043;
     }
-    .status {
+    #walletAddress {
       margin-top: 20px;
-      font-size: 16px;
-      word-break: break-word;
-    }
-    #wallet-url, #wallet-url-file {
-      margin-top: 10px;
       font-size: 14px;
-      color: #58a6ff;
       word-break: break-all;
-    }
-    img {
-      border-radius: 4px;
+      color: #58a6ff;
     }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="box">
     <h1>👛 GOAT10 Wallet</h1>
-
-    <a class="btn" href="https://metamask.app.link/dapp/goat10.vercel.app/wallet.html">
-      <img src="https://seeklogo.com/images/M/metamask-logo-09EDE53DBD-seeklogo.com.png" width="24" height="24">
-      Enter via MetaMask
-    </a>
-
-    <a class="btn" href="https://link.trustwallet.com/open_url?coin_id=60&url=https%3A%2F%2Fgoat10.vercel.app%2Fwallet.html">
-      <img src="https://cryptologos.cc/logos/trust-wallet-token-trust-logo.png" width="24" height="24">
-      Enter via Trust Wallet
-    </a>
-
-    <button class="btn connect-btn" onclick="connectWallet()">🔌 Connect Wallet</button>
-
-    <div class="status" id="status">❌ Wallet not connected</div>
-    <div id="wallet-url"></div>
-    <div id="wallet-url-file"></div> <!-- URL ni wallet.html sahifasida ko‘rsatish -->
+    <button onclick="connectWallet()">🔌 Connect Wallet</button>
+    <div id="walletAddress">❌ Wallet not connected</div>
   </div>
 
   <script>
     let web3;
 
-    function updateStatus(account) {
-      const status = document.getElementById("status");
-      const walletUrl = document.getElementById("wallet-url");
-      const walletUrlFile = document.getElementById("wallet-url-file");
-
-      if (account) {
-        const short = account.slice(0, 6) + "..." + account.slice(-4);
-        status.textContent = "✅ Connected: " + short;
-
-        const url = new URL(window.location);
-        if (!url.searchParams.get("address")) {
-          url.searchParams.set("address", account);
-          window.history.replaceState({}, '', url.toString());
-        }
-
-        walletUrl.innerHTML = '🔗 <b>Wallet URL:</b><br><a href="' + url.toString() + '" style="color:#58a6ff" target="_blank">' + url.toString() + '</a>';
-        
-        // 🆕 Sahifada real URL'ni ko‘rsatish
-        const currentUrl = window.location.href;
-        walletUrlFile.innerHTML = '📂 <b>Saved URL:</b><br><span style="color:#c9d1d9">' + currentUrl + '</span>';
-      } else {
-        status.textContent = "❌ Wallet not connected";
-        walletUrl.innerHTML = '';
-        walletUrlFile.innerHTML = '';
-      }
-    }
-
     async function connectWallet() {
-      if (!window.ethereum) {
-        alert("📱 Please open this page inside MetaMask or Trust Wallet browser.");
-        return;
-      }
-
-      try {
-        web3 = new Web3(window.ethereum);
-
-const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const account = accounts[0];
-        localStorage.setItem("goat10_wallet", account);
-        updateStatus(account);
-      } catch (err) {
-        alert("❌ Connection rejected.");
-      }
-    }
-
-    window.addEventListener("load", async () => {
-      const saved = localStorage.getItem("goat10_wallet");
-      const urlAddress = new URLSearchParams(window.location.search).get("address");
-      const showAccount = saved || urlAddress;
-
-      if (showAccount) {
-        updateStatus(showAccount);
-      }
-
       if (window.ethereum) {
         try {
           web3 = new Web3(window.ethereum);
-          const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          const account = accounts[0];
+          showAddress(account);
 
-          if (accounts.length > 0) {
-            localStorage.setItem("goat10_wallet", accounts[0]);
-            updateStatus(accounts[0]);
+          // URLga address ni qo‘shamiz:
+          const url = new URL(window.location);
+          if (!url.searchParams.get("address")) {
+            url.searchParams.set("address", account);
+            window.history.replaceState({}, '', url.toString());
           }
-        } catch (e) {
-          console.log("Wallet status error:", e);
+
+        } catch (err) {
+          alert("❌ Wallet ulanish rad etildi.");
         }
+      } else {
+        alert("📱 Iltimos, MetaMask yoki Trust Wallet ichida sahifani oching.");
+      }
+    }
+
+    function showAddress(account) {
+      const div = document.getElementById("walletAddress");
+      if (account) {
+        div.innerHTML = '✅ Connected: <br><b>${account}</b><br><br>🔗 <a href="?address=${account}" style="color:#58a6ff">Wallet URL</a>;'
+      }
+    }
+
+    window.addEventListener("load", () => {
+      const urlAddress = new URLSearchParams(window.location.search).get("address");
+      if (urlAddress) {
+        showAddress(urlAddress);
+      }
+
+      // Agar metamask avtomatik ochiq bo‘lsa
+      if (window.ethereum) {
+        web3 = new Web3(window.ethereum);
+        window.ethereum.request({ method: 'eth_accounts' }).then(accounts => {
+          if (accounts.length > 0) {
+            showAddress(accounts[0]);
+          }
+        });
       }
     });
   </script>
