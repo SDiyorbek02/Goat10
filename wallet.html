@@ -88,9 +88,7 @@
 
     <div class="status" id="status">❌ Wallet not connected</div>
     <div id="wallet-url"></div>
-
-    <!-- 🆕 Sahifa ichida URL ni ko‘rsatish -->
-    <div id="wallet-url-file"></div>
+    <div id="wallet-url-file"></div> <!-- URL ni wallet.html sahifasida ko‘rsatish -->
   </div>
 
   <script>
@@ -112,7 +110,10 @@
         }
 
         walletUrl.innerHTML = '🔗 <b>Wallet URL:</b><br><a href="' + url.toString() + '" style="color:#58a6ff" target="_blank">' + url.toString() + '</a>';
-        walletUrlFile.innerHTML = '📂 <b>Saved URL:</b><br><span style="color:#c9d1d9">' + url.toString() + '</span>'; // 🆕 URL’ni sahifa ichida chiqarish
+        
+        // 🆕 Sahifada real URL'ni ko‘rsatish
+        const currentUrl = window.location.href;
+        walletUrlFile.innerHTML = '📂 <b>Saved URL:</b><br><span style="color:#c9d1d9">' + currentUrl + '</span>';
       } else {
         status.textContent = "❌ Wallet not connected";
         walletUrl.innerHTML = '';
@@ -128,7 +129,8 @@
 
       try {
         web3 = new Web3(window.ethereum);
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const account = accounts[0];
         localStorage.setItem("goat10_wallet", account);
         updateStatus(account);
@@ -137,7 +139,7 @@
       }
     }
 
-window.addEventListener("load", async () => {
+    window.addEventListener("load", async () => {
       const saved = localStorage.getItem("goat10_wallet");
       const urlAddress = new URLSearchParams(window.location.search).get("address");
       const showAccount = saved || urlAddress;
