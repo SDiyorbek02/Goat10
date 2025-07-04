@@ -1,111 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
   <title>GOAT10 Wallet</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
   <style>
     body {
       background: #0d1117;
       color: white;
       font-family: sans-serif;
+      margin: 0;
+      padding: 0;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
-      margin: 0;
+      flex-direction: column;
       text-align: center;
     }
     .box {
       background: #161b22;
-      padding: 30px;
+      padding: 25px;
       border-radius: 16px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
-      max-width: 90%;
-      width: 400px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      width: 90%;
+      max-width: 420px;
     }
     h1 {
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
-    button {
-      background: #238636;
-      color: white;
-      border: none;
-      padding: 14px 20px;
-      font-size: 16px;
-      border-radius: 10px;
-      cursor: pointer;
-      width: 100%;
+    #status {
+      margin-bottom: 15px;
     }
-    button:hover {
-      background: #2ea043;
-    }
-    #walletAddress {
-      margin-top: 20px;
+    #wallet {
       font-size: 14px;
-      word-break: break-all;
       color: #58a6ff;
+      word-break: break-word;
+    }
+    a {
+      color: #58a6ff;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
   <div class="box">
     <h1>👛 GOAT10 Wallet</h1>
-    <button onclick="connectWallet()">🔌 Connect Wallet</button>
-    <div id="walletAddress">❌ Wallet not connected</div>
+    <div id="status">⏳ Connecting to wallet...</div>
+    <div id="wallet">...</div>
   </div>
 
   <script>
-    let web3;
+    async function autoConnect() {
+      const status = document.getElementById("status");
+      const walletDiv = document.getElementById("wallet");
 
-    async function connectWallet() {
-      if (window.ethereum) {
-        try {
-          web3 = new Web3(window.ethereum);
-          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          const account = accounts[0];
-          showAddress(account);
+      if (typeof window.ethereum === "undefined") {
+        status.innerText = "❌ Wallet not found. Please open in MetaMask or Trust Wallet browser.";
+        walletDiv.innerHTML = "";
+        return;
+      }
 
-          // URLga address ni qo‘shamiz:
-          const url = new URL(window.location);
-          if (!url.searchParams.get("address")) {
-            url.searchParams.set("address", account);
-            window.history.replaceState({}, '', url.toString());
-          }
+      try {
+        const web3 = new Web3(window.ethereum);
 
-        } catch (err) {
-          alert("❌ Wallet ulanish rad etildi.");
+        // Try to get already connected accounts
+        const oldAccounts = await window.ethereum.request({ method: "eth_accounts" });
+        let account;
+
+        if (oldAccounts.length > 0) {
+          account = oldAccounts[0];
+        } else {
+          const newAccounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+          account = newAccounts[0];
         }
-      } else {
-        alert("📱 Iltimos, MetaMask yoki Trust Wallet ichida sahifani oching.");
+
+        status.innerText = "✅ Wallet connected!";
+        walletDiv.innerHTML =''
+          <b>Address:</b><br>${account}<br><br>
+          🔗 <b>URL:</b><br>
+          <a href="?address=${account}">wallet.html?address=${account}</a>
+        ;
+
+        // Check if address already in URL, if not – redirect
+        const url = new URL(window.location.href);
+        const urlAddress = url.searchParams.get("address");
+
+        if (!urlAddress) {
+          // Add address to URL and redirect
+          url.searchParams.set("address", account);
+          window.location.href = url.toString();  // this will reload with ?address=...
+        }
+
+      } catch (err) {
+        console.error("Connection error:", err);
+        status.innerText = "❌ Connection rejected.";
+        walletDiv.innerHTML = "";
       }
     }
 
-    function showAddress(account) {
-      const div = document.getElementById("walletAddress");
-      if (account) {
-        div.innerHTML = '✅ Connected: <br><b>${account}</b><br><br>🔗 <a href="?address=${account}" style="color:#58a6ff">Wallet URL</a>;'
-      }
-    }
-
-    window.addEventListener("load", () => {
-      const urlAddress = new URLSearchParams(window.location.search).get("address");
-      if (urlAddress) {
-        showAddress(urlAddress);
-      }
-
-      // Agar metamask avtomatik ochiq bo‘lsa
-      if (window.ethereum) {
-        web3 = new Web3(window.ethereum);
-        window.ethereum.request({ method: 'eth_accounts' }).then(accounts => {
-          if (accounts.length > 0) {
-            showAddress(accounts[0]);
-          }
-        });
-      }
-    });
+    window.addEventListener('load', autoConnect);
   </script>
 </body>
 </html>
