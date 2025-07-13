@@ -2,108 +2,88 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>GOAT10 Wallet</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GOAT10 Wallet</title>
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
   <style>
     body {
-      background: #0d1117;
-      color: white;
-      font-family: sans-serif;
       margin: 0;
-      padding: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      flex-direction: column;
+      font-family: Arial, sans-serif;
       text-align: center;
-    }
-    .box {
-      background: #161b22;
-      padding: 25px;
-      border-radius: 16px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.5);
-      width: 90%;
-      max-width: 420px;
+      padding: 30px;
+      background-color: #f9f9f9;
     }
     h1 {
-      margin-bottom: 10px;
+      color: #333;
+    }
+    button {
+      background-color: #f0b90b;
+      color: black;
+      font-size: 18px;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 20px;
     }
     #status {
-      margin-bottom: 15px;
+      margin-top: 30px;
+      font-size: 16px;
+      color: green;
     }
-    #wallet {
+    .address-box {
+      margin-top: 20px;
       font-size: 14px;
-      color: #58a6ff;
-      word-break: break-word;
-    }
-    a {
-      color: #58a6ff;
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
+      word-break: break-all;
+      background: #fff;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
     }
   </style>
 </head>
 <body>
-  <div class="box">
-    <h1>👛 GOAT10 Wallet</h1>
-    <div id="status">⏳ Connecting to wallet...</div>
-    <div id="wallet">...</div>
-  </div>
+  <h1>GOAT10 💧</h1>
+  <p>Connect your BNB Wallet (MetaMask / Trust Wallet)</p>
+  <button onclick="connectWallet()">🔗 Connect Wallet</button>
+  <div id="status">❌ Wallet not connected</div>
+  <div class="address-box" id="wallet-address"></div>
 
   <script>
-    async function autoConnect() {
-      const status = document.getElementById("status");
-      const walletDiv = document.getElementById("wallet");
+    async function connectWallet() {
+      if (typeof window.ethereum !== 'undefined') {
+        try {
+          const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+          const account = accounts[0];
+          document.getElementById("status").innerText = "✅ Wallet connected!";
+          document.getElementById("wallet-address").innerHTML =
+            "<b>Address:</b><br>" + account + "<br><br>" +
+            "🔗 <b>URL:</b><br><a href='?address=" + account + "'>wallet.html?address=" + account + "</a>";
 
-      if (typeof window.ethereum === "undefined") {
-        status.innerText = "❌ Wallet not found. Please open in MetaMask or Trust Wallet browser.";
-        walletDiv.innerHTML = "";
-        return;
-      }
+          // Auto switch or add BNB Chain if needed
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: '0x38',
+              chainName: 'BNB Smart Chain',
+              nativeCurrency: {
+                name: 'BNB',
+                symbol: 'BNB',
+                decimals: 18
+              },
+              rpcUrls: ['https://bsc-dataseed.binance.org/'],
+              blockExplorerUrls: ['https://bscscan.com']
+            }]
+          });
 
-      try {
-        const web3 = new Web3(window.ethereum);
-
-        // Try to get already connected accounts
-        const oldAccounts = await window.ethereum.request({ method: "eth_accounts" });
-        let account;
-
-        if (oldAccounts.length > 0) {
-          account = oldAccounts[0];
-        } else {
-          const newAccounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-          account = newAccounts[0];
+        } catch (error) {
+          console.error(error);
+          document.getElementById("status").innerText = "❌ Failed to connect";
         }
-
-        status.innerText = "✅ Wallet connected!";
-        walletDiv.innerHTML =''
-          <b>Address:</b><br>${account}<br><br>
-          🔗 <b>URL:</b><br>
-          <a href="?address=${account}">wallet.html?address=${account}</a>
-        ;
-
-        // Check if address already in URL, if not – redirect
-        const url = new URL(window.location.href);
-        const urlAddress = url.searchParams.get("address");
-
-        if (!urlAddress) {
-          // Add address to URL and redirect
-          url.searchParams.set("address", account);
-          window.location.href = url.toString();  // this will reload with ?address=...
-        }
-
-      } catch (err) {
-        console.error("Connection error:", err);
-        status.innerText = "❌ Connection rejected.";
-        walletDiv.innerHTML = "";
+      } else {
+        alert("Iltimos, MetaMask yoki Trust Wallet ilovasini o‘rnating.");
       }
     }
-
-    window.addEventListener('load', autoConnect);
   </script>
 </body>
 </html>
