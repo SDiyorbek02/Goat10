@@ -1,154 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GOAT10 Wallet</title>
-  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #f0b90b, #f9f9f9);
-      min-height: 100vh;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOAT10 Wallet</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
+  <style>
+    body {
+       font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #f0b90b, #ffffff);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      flex-direction: column;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
       text-align: center;
     }
-    h1 {
-      color: #333;
-      margin-bottom: 10px;
-    }
-    p {
-      color: #444;
-    }
-    .buttons {
+    h1 { color: #333; }
+    .status-box, .address-box {
       margin-top: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      width: 220px;
-    }
-    button, a button {
-      width: 100%;
-      padding: 14px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    button:hover {
-      opacity: 0.9;
-    }
-    .metamask-btn {
-      background-color: #f6851b;
-      color: white;
-    }
-    .browser-btn {
-      background-color: #3b99fc;
-      color: white;
-    }
-    #status {
-      margin-top: 25px;
-      font-size: 16px;
-      color: green;
-    }
-    .address-box {
-      margin-top: 15px;
       padding: 15px;
-      background: #fff;
+      background-color: #e0ffe0;
       border: 1px solid #ccc;
       border-radius: 10px;
-      word-break: break-word;
+      font-size: 16px;
       color: #333;
-      font-size: 14px;
+      word-break: break-word;
     }
+    button {
+      margin-top: 15px;
+      padding: 12px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+      width: 260px;
+    }
+    .connect-btn {
+      background-color: #1a73e8;
+      color: white;
+    }
+    button:hover { opacity: 0.9; }
   </style>
 </head>
 <body>
-  <h1>GOAT10 Wallet 💧</h1>
-  <p>Connect your BNB wallet:</p>
 
-  <div class="buttons">
-    <!-- MetaMask Mobile Deep Link -->
-    <a href="https://metamask.app.link/dapp/goat10.vercel.app/wallet.html">
-      <button class="metamask-btn">🦊 Open in MetaMask</button>
-    </a>
+  <h1>GOAT10 Wallet 💧</h1>
+  <p>Just tap the button and connect your wallet:</p>
 
-    <!-- Trust Wallet & Browser -->
-    <a href="https://goat10.vercel.app/wallet.html" target="_blank">
-      <button class="browser-btn">🌐 Open in Browser (Trust Wallet)</button>
-    </a>
+  <button class="connect-btn" onclick="autoConnect()">🔗 Tap to Connect Wallet</button>
 
-    <!-- Direct Connect Button -->
-    <button onclick="connectWallet()">🔗 Connect Automatically</button>
-  </div>
+  <div id="status" class="status-box">⏳ Waiting for connection...</div>
+  <div id="address" class="address-box"></div>
 
-  <div id="status">⏳ Waiting for wallet connection...</div>
-  <div class="address-box" id="wallet-address"></div>
+  <script>
+    async function autoConnect() {
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-  <script>
-    async function connectWallet() {
-      if (typeof window.ethereum !== 'undefined') {
-        try {
-          // Request accounts
-          const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-          const account = accounts[0];
+      if (typeof window.ethereum !== 'undefined') {
+        // MetaMask mavjud – ulanish
+        try {
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          await provider.send("eth_requestAccounts", []);
+          const signer = provider.getSigner();
+          const account = await signer.getAddress();
+          updateUI(account);
+        } catch (e) {
+          console.error(e);
+          document.getElementById("status").innerText = "❌ MetaMask connection failed.";
+        }
 
-          // Update UI
-          document.getElementById("status").innerText = "✅ Wallet connected!";
-          document.getElementById("wallet-address").innerHTML =
-            "<b>Address:</b><br>" + account + "<br><br>" +
-            "🔗 <b>URL:</b><br><a href='?address=" + account + "'>wallet.html?address=" + account + "</a>";
+      } else if (isMobile) {
+        // Agar mobil qurilma bo‘lsa – deep link orqali MetaMask ochamiz
+        window.location.href = "https://metamask.app.link/dapp/goat10.vercel.app/wallet.html";
 
-          // Switch or add BNB Chain
-          await window.ethereum.request({
-            method: 'wallet_addEthereumChain',
-            params: [{
-              chainId: '0x38',
-              chainName: 'BNB Smart Chain',
-              nativeCurrency: {
-                name: 'BNB',
-                symbol: 'BNB',
-                decimals: 18
-              },
-              rpcUrls: ['https://bsc-dataseed.binance.org/'],
-              blockExplorerUrls: ['https://bscscan.com']
-            }]
-          });
+      } else {
+        // Trust Wallet – WalletConnect orqali ulanamiz
+        const wcProvider = new WalletConnectProvider.default({
+          rpc: { 56: "https://bsc-dataseed.binance.org/" },
+          chainId: 56
+        });
 
-        } catch (error) {
-          console.error(error);
-          document.getElementById("status").innerText = "❌ Wallet connection failed.";
-        }
-      } else {
-        document.getElementById("status").innerText = "🦊 MetaMask or Trust Wallet not detected.";
-        alert("Iltimos, MetaMask yoki Trust Wallet o‘rnating.");
-      }
-    }
+        try {
+          await wcProvider.enable();
+          const web3Provider = new ethers.providers.Web3Provider(wcProvider);
+          const signer = web3Provider.getSigner();
+          const account = await signer.getAddress();
+          updateUI(account);
+        } catch (e) {
+          console.error(e);
+          document.getElementById("status").innerText = "❌ WalletConnect failed.";
+        }
+      }
+    }
 
-    // Auto-connect on load
-    window.onload = async function () {
-      if (typeof window.ethereum !== 'undefined') {
+    function updateUI(account) {
+      document.getElementById("status").innerText = "✅ Wallet connected!";
+      document.getElementById("address").innerHTML =
+        "<b>Address:</b><br>" + account + "<br><br>" +
+        "<b>URL:</b><br><a href='?address=" + account + "'>wallet.html?address=" + account + "</a>";
 
-try {
-          const accounts = await ethereum.request({ method: 'eth_accounts' });
-          if (accounts.length > 0) {
-            const account = accounts[0];
-            document.getElementById("status").innerText = "✅ Wallet connected!";
-            document.getElementById("wallet-address").innerHTML =
-              "<b>Address:</b><br>" + account + "<br><br>" +
-              "🔗 <b>URL:</b><br><a href='?address=" + account + "'>wallet.html?address=" + account + "</a>";
-          }
-        } catch (err) {
-          console.error(err);
-        }
-      }
-    };
-  </script>
+      window.history.replaceState({}, '', '?address=' + account);
+    }
+
+    // Auto reconnect if already connected (MetaMask)
+    window.onload = async () => {
+      if (typeof window.ethereum !== 'undefined') {
+        try {
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          const accounts = await provider.listAccounts();
+          if (accounts.length > 0) {
+            updateUI(accounts[0]);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    };
+  </script>
+
 </body>
 </html>
