@@ -1,35 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GOAT10 Wallet</title>
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
   <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
   <style>
     body {
-      font-family: sans-serif;
-      background: linear-gradient(to right, #f0b90b, #fff);
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #f0b90b, #ffffff);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      margin: 0;
       padding: 20px;
       text-align: center;
-   }
+      margin: 0;
+    }
+    h1 { color: #222; margin-bottom: 10px; }
+    p { color: #333; }
 
     button {
-      background: #1a73e8;
-      color: #fff;
-      border: none;
-      padding: 12px 24px;
+      padding: 12px 20px;
+      margin: 10px;
       font-size: 16px;
+      border: none;
       border-radius: 8px;
       cursor: pointer;
-      margin-top: 20px;
+      transition: 0.3s;
+      width: 240px;
     }
+    .metamask-btn { background-color: #f6851b; color: white; }
+    .trust-btn { background-color: #3773f5; color: white; }
 
     .info {
       margin-top: 20px;
@@ -38,45 +42,54 @@
       border-radius: 10px;
       width: 100%;
       max-width: 360px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       word-break: break-word;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      color: #111;
     }
   </style>
 </head>
 <body>
 
   <h1>GOAT10 Wallet 💧</h1>
-  <p>Connect your wallet below</p>
+  <p>Choose wallet to connect:</p>
 
-  <button onclick="connectWallet()">🔗 Connect Wallet</button>
+  <button class="metamask-btn" onclick="connectMetaMask()">🦊 Connect MetaMask</button>
+  <button class="trust-btn" onclick="connectTrustWallet()">🔗 Connect Trust Wallet</button>
 
   <div class="info" id="result">⏳ Waiting for connection...</div>
 
   <script>
-    async function connectWallet() {
-      const isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
+    function updateUI(address) {
+      document.getElementById("result").innerHTML =
+        "<b>✅ Wallet connected</b><br><br>" +
+        "<b>Address:</b><br>" + address + "<br><br>" +
+        "<b>URL:</b><br><a href='?address=" + address + "'>wallet.html?address=" + address + "</a>";
 
+      // update URL
+      window.history.replaceState({}, '', '?address=' + address);
+    }
+
+    async function connectMetaMask() {
+      const isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
       if (typeof window.ethereum !== 'undefined') {
         try {
           const web3 = new Web3(window.ethereum);
           await window.ethereum.request({ method: 'eth_requestAccounts' });
           const accounts = await web3.eth.getAccounts();
           const address = accounts[0];
-          showWallet(address);
-          return;
+          updateUI(address);
         } catch (e) {
-          console.error(e);
           document.getElementById("result").innerText = "❌ MetaMask connection failed.";
         }
-      }
-
-      if (isMobile) {
-        // Mobile foydalanuvchi uchun MetaMask ilovasiga yo‘naltirish
+      } else if (isMobile) {
+        // Mobile foydalanuvchiga MetaMask ilovasini ochamiz
         window.location.href = "https://metamask.app.link/dapp/goat10.vercel.app/wallet.html";
-        return;
+      } else {
+        alert("MetaMask not detected.");
       }
+    }
 
-      // MetaMask yo‘q bo‘lsa – Trust Wallet (WalletConnect)
+    async function connectTrustWallet() {
       const provider = new WalletConnectProvider.default({
         rpc: { 56: "https://bsc-dataseed.binance.org/" },
         chainId: 56
@@ -87,30 +100,18 @@
         const web3 = new Web3(provider);
         const accounts = await web3.eth.getAccounts();
         const address = accounts[0];
-        showWallet(address);
+        updateUI(address);
       } catch (e) {
-        console.error(e);
         document.getElementById("result").innerText = "❌ Trust Wallet connection failed.";
       }
     }
 
-    function showWallet(address) {
-      // URL ni yangilash (address=... qismi)
-      window.history.replaceState({}, '', '?address=' + address);
-
-      // HTML ko‘rsatish
-      document.getElementById("result").innerHTML =
-        "<b>✅ Wallet connected!</b><br><br>" +
-        "<b>Address:</b><br>" + address + "<br><br>" +
-        "<b>URL:</b><br><a href='?address=" + address + "'>wallet.html?address=" + address + "</a>";
-    }
-
-    // Auto-show if already connected
+    // URLdan address borligini tekshirib ko‘rsatish
     window.onload = () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const addr = urlParams.get("address");
-      if (addr) {
-        showWallet(addr);
+      const params = new URLSearchParams(window.location.search);
+      const address = params.get("address");
+      if (address) {
+        updateUI(address);
       }
     };
   </script>
