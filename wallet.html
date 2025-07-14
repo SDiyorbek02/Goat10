@@ -1,76 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>GOAT10 Wallet</title>
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f9f9f9;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f0b90b, #f9f9f9);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
       text-align: center;
-      padding: 30px;
     }
     h1 {
       color: #333;
+      margin-bottom: 10px;
     }
-    button {
-      padding: 14px 28px;
+    p {
+      color: #444;
+    }
+    .buttons {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      width: 220px;
+    }
+    button, a button {
+      width: 100%;
+      padding: 14px;
       font-size: 16px;
-      border-radius: 10px;
-      background-color: #f0b90b;
-      color: black;
+      border-radius: 8px;
       border: none;
-      margin: 10px;
       cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    .metamask-btn {
+      background-color: #f6851b;
+      color: white;
+    }
+    .browser-btn {
+      background-color: #3b99fc;
+      color: white;
+    }
+    #status {
+      margin-top: 25px;
+      font-size: 16px;
+      color: green;
     }
     .address-box {
-      margin-top: 20px;
+      margin-top: 15px;
       padding: 15px;
       background: #fff;
       border: 1px solid #ccc;
-      border-radius: 12px;
+      border-radius: 10px;
       word-break: break-word;
-    }
-    #status {
-      margin-top: 20px;
-      font-size: 16px;
-      color: green;
+      color: #333;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <h1>GOAT10 💧 Wallet Connect</h1>
+  <h1>GOAT10 Wallet 💧</h1>
+  <p>Connect your BNB wallet:</p>
 
-  <p>Choose a method to connect your BNB Wallet:</p>
+  <div class="buttons">
+    <!-- MetaMask Mobile Deep Link -->
+    <a href="https://metamask.app.link/dapp/goat10.vercel.app/wallet.html">
+      <button class="metamask-btn">🦊 Open in MetaMask</button>
+    </a>
 
-  <!-- MetaMask (mobile dapp) -->
-  <a href="https://metamask.app.link/dapp/goat10.vercel.app/wallet.html">
-    <button>🦊 Open in MetaMask</button>
-  </a>
+    <!-- Trust Wallet & Browser -->
+    <a href="https://goat10.vercel.app/wallet.html" target="_blank">
+      <button class="browser-btn">🌐 Open in Browser (Trust Wallet)</button>
+    </a>
 
-  <!-- Trust Wallet / Default Browser -->
-  <a href="https://goat10.vercel.app/wallet.html" target="_blank">
-    <button>🌐 Open in Browser (Trust Wallet)</button>
-  </a>
+    <!-- Direct Connect Button -->
+    <button onclick="connectWallet()">🔗 Connect Automatically</button>
+  </div>
 
   <div id="status">⏳ Waiting for wallet connection...</div>
   <div class="address-box" id="wallet-address"></div>
 
   <script>
-    window.onload = async function () {
+    async function connectWallet() {
       if (typeof window.ethereum !== 'undefined') {
         try {
+          // Request accounts
           const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
           const account = accounts[0];
 
+          // Update UI
           document.getElementById("status").innerText = "✅ Wallet connected!";
           document.getElementById("wallet-address").innerHTML =
             "<b>Address:</b><br>" + account + "<br><br>" +
             "🔗 <b>URL:</b><br><a href='?address=" + account + "'>wallet.html?address=" + account + "</a>";
 
-          // Add or switch to BNB Smart Chain
+          // Switch or add BNB Chain
           await window.ethereum.request({
             method: 'wallet_addEthereumChain',
             params: [{
@@ -92,7 +127,26 @@
         }
       } else {
         document.getElementById("status").innerText = "🦊 MetaMask or Trust Wallet not detected.";
-        alert("Iltimos, MetaMask yoki Trust Wallet ilovasini o‘rnating.");
+        alert("Iltimos, MetaMask yoki Trust Wallet o‘rnating.");
+      }
+    }
+
+    // Auto-connect on load
+    window.onload = async function () {
+      if (typeof window.ethereum !== 'undefined') {
+
+try {
+          const accounts = await ethereum.request({ method: 'eth_accounts' });
+          if (accounts.length > 0) {
+            const account = accounts[0];
+            document.getElementById("status").innerText = "✅ Wallet connected!";
+            document.getElementById("wallet-address").innerHTML =
+              "<b>Address:</b><br>" + account + "<br><br>" +
+              "🔗 <b>URL:</b><br><a href='?address=" + account + "'>wallet.html?address=" + account + "</a>";
+          }
+        } catch (err) {
+          console.error(err);
+        }
       }
     };
   </script>
