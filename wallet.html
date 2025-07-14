@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GOAT10 Wallet</title>
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
   <style>
-    body {
-       font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #f0b90b, #ffffff);
+    body {
+      font-family: sans-serif;
+      background: linear-gradient(to right, #f0b90b, #fff);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -18,107 +18,99 @@
       margin: 0;
       padding: 20px;
       text-align: center;
-    }
-    h1 { color: #333; }
-    .status-box, .address-box {
-      margin-top: 20px;
-      padding: 15px;
-      background-color: #e0ffe0;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      font-size: 16px;
-      color: #333;
-      word-break: break-word;
-    }
+   }
+
     button {
-      margin-top: 15px;
-      padding: 12px 20px;
-      font-size: 16px;
+      background: #1a73e8;
+      color: #fff;
       border: none;
+      padding: 12px 24px;
+      font-size: 16px;
       border-radius: 8px;
       cursor: pointer;
-      transition: 0.3s;
-      width: 260px;
+      margin-top: 20px;
     }
-    .connect-btn {
-      background-color: #1a73e8;
-      color: white;
+
+    .info {
+      margin-top: 20px;
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 360px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      word-break: break-word;
     }
-    button:hover { opacity: 0.9; }
   </style>
 </head>
 <body>
 
   <h1>GOAT10 Wallet 💧</h1>
-  <p>Just tap the button and connect your wallet:</p>
+  <p>Connect your wallet below</p>
 
-  <button class="connect-btn" onclick="autoConnect()">🔗 Tap to Connect Wallet</button>
+  <button onclick="connectWallet()">🔗 Connect Wallet</button>
 
-  <div id="status" class="status-box">⏳ Waiting for connection...</div>
-  <div id="address" class="address-box"></div>
+  <div class="info" id="result">⏳ Waiting for connection...</div>
 
   <script>
-    async function autoConnect() {
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    async function connectWallet() {
+      const isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
 
       if (typeof window.ethereum !== 'undefined') {
-        // MetaMask mavjud – ulanish
         try {
-          const provider = new ethers.providers.Web3Provider(window.ethereum);
-          await provider.send("eth_requestAccounts", []);
-          const signer = provider.getSigner();
-          const account = await signer.getAddress();
-          updateUI(account);
+          const web3 = new Web3(window.ethereum);
+          await window.ethereum.request({ method: 'eth_requestAccounts' });
+          const accounts = await web3.eth.getAccounts();
+          const address = accounts[0];
+          showWallet(address);
+          return;
         } catch (e) {
           console.error(e);
-          document.getElementById("status").innerText = "❌ MetaMask connection failed.";
+          document.getElementById("result").innerText = "❌ MetaMask connection failed.";
         }
+      }
 
-      } else if (isMobile) {
-        // Agar mobil qurilma bo‘lsa – deep link orqali MetaMask ochamiz
+      if (isMobile) {
+        // Mobile foydalanuvchi uchun MetaMask ilovasiga yo‘naltirish
         window.location.href = "https://metamask.app.link/dapp/goat10.vercel.app/wallet.html";
+        return;
+      }
 
-      } else {
-        // Trust Wallet – WalletConnect orqali ulanamiz
-        const wcProvider = new WalletConnectProvider.default({
-          rpc: { 56: "https://bsc-dataseed.binance.org/" },
-          chainId: 56
-        });
+      // MetaMask yo‘q bo‘lsa – Trust Wallet (WalletConnect)
+      const provider = new WalletConnectProvider.default({
+        rpc: { 56: "https://bsc-dataseed.binance.org/" },
+        chainId: 56
+      });
 
-        try {
-          await wcProvider.enable();
-          const web3Provider = new ethers.providers.Web3Provider(wcProvider);
-          const signer = web3Provider.getSigner();
-          const account = await signer.getAddress();
-          updateUI(account);
-        } catch (e) {
-          console.error(e);
-          document.getElementById("status").innerText = "❌ WalletConnect failed.";
-        }
+      try {
+        await provider.enable();
+        const web3 = new Web3(provider);
+        const accounts = await web3.eth.getAccounts();
+        const address = accounts[0];
+        showWallet(address);
+      } catch (e) {
+        console.error(e);
+        document.getElementById("result").innerText = "❌ Trust Wallet connection failed.";
       }
     }
 
-    function updateUI(account) {
-      document.getElementById("status").innerText = "✅ Wallet connected!";
-      document.getElementById("address").innerHTML =
-        "<b>Address:</b><br>" + account + "<br><br>" +
-        "<b>URL:</b><br><a href='?address=" + account + "'>wallet.html?address=" + account + "</a>";
+    function showWallet(address) {
+      // URL ni yangilash (address=... qismi)
+      window.history.replaceState({}, '', '?address=' + address);
 
-      window.history.replaceState({}, '', '?address=' + account);
+      // HTML ko‘rsatish
+      document.getElementById("result").innerHTML =
+        "<b>✅ Wallet connected!</b><br><br>" +
+        "<b>Address:</b><br>" + address + "<br><br>" +
+        "<b>URL:</b><br><a href='?address=" + address + "'>wallet.html?address=" + address + "</a>";
     }
 
-    // Auto reconnect if already connected (MetaMask)
-    window.onload = async () => {
-      if (typeof window.ethereum !== 'undefined') {
-        try {
-          const provider = new ethers.providers.Web3Provider(window.ethereum);
-          const accounts = await provider.listAccounts();
-          if (accounts.length > 0) {
-            updateUI(accounts[0]);
-          }
-        } catch (e) {
-          console.error(e);
-        }
+    // Auto-show if already connected
+    window.onload = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const addr = urlParams.get("address");
+      if (addr) {
+        showWallet(addr);
       }
     };
   </script>
