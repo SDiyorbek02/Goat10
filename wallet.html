@@ -1,128 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GOAT10 Wallet</title>
-  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
-  <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #f0b90b, #ffffff);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
-      margin: 0;
-      text-align: center;
-    }
-
-    h1 { color: #222; margin-bottom: 10px; }
-    p { color: #333; }
-
-    button {
-      padding: 12px 20px;
-      margin: 10px;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.3s;
-      width: 240px;
-    }
-
-    .metamask-btn { background-color: #f6851b; color: white; }
-    .trust-btn { background-color: #3773f5; color: white; }
-
-    .info {
-      margin-top: 20px;
-      background: #fff;
-      padding: 15px;
-      border-radius: 10px;
-      width: 100%;
-      max-width: 360px;
-      word-break: break-word;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      color: #111;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GOAT10 Wallet</title>
+  <link rel="stylesheet" href="wallet-style.css" />
 </head>
 <body>
+  <div class="container">
+    <h1>GOAT10 Wallet 💧</h1>
+    <p>Please choose your wallet to connect:</p>
 
-  <h1>GOAT10 Wallet 💧</h1>
-  <p>Select wallet to connect:</p>
+    <button class="metamask" onclick="openMetaMask()">
+      🦊 Connect via MetaMask
+    </button>
 
-  <button class="metamask-btn" onclick="connectMetaMask()">🦊 Connect MetaMask</button>
-  <button class="trust-btn" onclick="connectTrustWallet()">🔗 Connect Trust Wallet</button>
+    <button class="trust" onclick="openTrustWallet()">
+      🔐 Connect via Trust Wallet
+    </button>
 
-  <div class="info" id="result">⏳ Waiting for connection...</div>
+    <div class="info" id="walletInfo">
+      ⏳ Waiting for wallet connection...
+    </div>
+  </div>
 
-  <script>
-    function updateUI(address) {
-      const fullUrl = window.location.origin + window.location.pathname + '?address=' + address;
-      document.getElementById("result").innerHTML =
-        "<b>✅ Wallet connected</b><br><br>" +
-        "<b>Address:</b><br>" + address + "<br><br>" +
-        "<b>URL:</b><br><a href='" + fullUrl + "'>" + fullUrl + "</a>";
-
-      // Majburan URL ni yangilaymiz
-      window.location.href = fullUrl;
-    }
-
-    async function connectMetaMask() {
-      const isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
-
-      if (typeof window.ethereum !== 'undefined') {
-        try {
-          const web3 = new Web3(window.ethereum);
-          await window.ethereum.request({ method: 'eth_requestAccounts' });
-          const accounts = await web3.eth.getAccounts();
-          const address = accounts[0];
-          updateUI(address);
-        } catch (e) {
-          alert("❌ MetaMask connection failed.");
-        }
-      } else if (isMobile) {
-        // Mobilda MetaMask ilovasiga ochamiz
-        window.location.href = "https://metamask.app.link/dapp/" + window.location.hostname + window.location.pathname;
-      } else {
-        alert("🦊 MetaMask is not installed.");
-      }
-    }
-
-    async function connectTrustWallet() {
-      const provider = new WalletConnectProvider.default({
-        rpc: { 56: "https://bsc-dataseed.binance.org/" },
-        chainId: 56
-      });
-
-      try {
-        await provider.enable();
-        const web3 = new Web3(provider);
-        const accounts = await web3.eth.getAccounts();
-        const address = accounts[0];
-        updateUI(address);
-      } catch (e) {
-        alert("❌ Trust Wallet connection failed.");
-      }
-    }
-
-    // URL dan address bo‘lsa, ko‘rsatamiz
-    window.onload = () => {
-      const params = new URLSearchParams(window.location.search);
-      const address = params.get("address");
-      if (address) {
-        const fullUrl = window.location.href;
-        document.getElementById("result").innerHTML =
-          "<b>✅ Wallet connected</b><br><br>" +
-          "<b>Address:</b><br>" + address + "<br><br>" +
-          "<b>URL:</b><br><a href='" + fullUrl + "'>" + fullUrl + "</a>";
-      }
-    };
-  </script>
-
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <script src="wallet.js"></script>
 </body>
 </html>
