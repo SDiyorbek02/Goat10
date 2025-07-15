@@ -16,9 +16,10 @@
       justify-content: center;
       min-height: 100vh;
       padding: 20px;
-      text-align: center;
       margin: 0;
+      text-align: center;
     }
+
     h1 { color: #222; margin-bottom: 10px; }
     p { color: #333; }
 
@@ -32,6 +33,7 @@
       transition: 0.3s;
       width: 240px;
     }
+
     .metamask-btn { background-color: #f6851b; color: white; }
     .trust-btn { background-color: #3773f5; color: white; }
 
@@ -51,7 +53,7 @@
 <body>
 
   <h1>GOAT10 Wallet 💧</h1>
-  <p>Choose wallet to connect:</p>
+  <p>Select wallet to connect:</p>
 
   <button class="metamask-btn" onclick="connectMetaMask()">🦊 Connect MetaMask</button>
   <button class="trust-btn" onclick="connectTrustWallet()">🔗 Connect Trust Wallet</button>
@@ -60,17 +62,19 @@
 
   <script>
     function updateUI(address) {
+      const fullUrl = window.location.origin + window.location.pathname + '?address=' + address;
       document.getElementById("result").innerHTML =
         "<b>✅ Wallet connected</b><br><br>" +
         "<b>Address:</b><br>" + address + "<br><br>" +
-        "<b>URL:</b><br><a href='?address=" + address + "'>wallet.html?address=" + address + "</a>";
+        "<b>URL:</b><br><a href='" + fullUrl + "'>" + fullUrl + "</a>";
 
-      // update URL
-      window.history.replaceState({}, '', '?address=' + address);
+      // Majburan URL ni yangilaymiz
+      window.location.href = fullUrl;
     }
 
     async function connectMetaMask() {
       const isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
+
       if (typeof window.ethereum !== 'undefined') {
         try {
           const web3 = new Web3(window.ethereum);
@@ -79,13 +83,13 @@
           const address = accounts[0];
           updateUI(address);
         } catch (e) {
-          document.getElementById("result").innerText = "❌ MetaMask connection failed.";
+          alert("❌ MetaMask connection failed.");
         }
       } else if (isMobile) {
-        // Mobile foydalanuvchiga MetaMask ilovasini ochamiz
-        window.location.href = "https://metamask.app.link/dapp/goat10.vercel.app/wallet.html";
+        // Mobilda MetaMask ilovasiga ochamiz
+        window.location.href = "https://metamask.app.link/dapp/" + window.location.hostname + window.location.pathname;
       } else {
-        alert("MetaMask not detected.");
+        alert("🦊 MetaMask is not installed.");
       }
     }
 
@@ -102,16 +106,20 @@
         const address = accounts[0];
         updateUI(address);
       } catch (e) {
-        document.getElementById("result").innerText = "❌ Trust Wallet connection failed.";
+        alert("❌ Trust Wallet connection failed.");
       }
     }
 
-    // URLdan address borligini tekshirib ko‘rsatish
+    // URL dan address bo‘lsa, ko‘rsatamiz
     window.onload = () => {
       const params = new URLSearchParams(window.location.search);
       const address = params.get("address");
       if (address) {
-        updateUI(address);
+        const fullUrl = window.location.href;
+        document.getElementById("result").innerHTML =
+          "<b>✅ Wallet connected</b><br><br>" +
+          "<b>Address:</b><br>" + address + "<br><br>" +
+          "<b>URL:</b><br><a href='" + fullUrl + "'>" + fullUrl + "</a>";
       }
     };
   </script>
