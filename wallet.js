@@ -41,7 +41,7 @@ function displayAddress() {
       '<b>URL:</b><br><a href="${fullUrl}" style="color:lightblue">${fullUrl}</a>'
     ;
   } else {
-    document.getElementById("walletInfo").innerText = "⏳ Not connected.";
+    document.getElementById("walletInfo").innerText = "⏳Once all tokens are listed, wallet connection and trading (buy/sell) will be enabled. .";
   }
 }
 
